@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+
 //10:30 AM
 public class MultiThreadsSync implements Runnable{
 
 	private List<Integer> list1 = new ArrayList<Integer>();
 	private List<Integer> list2 = new ArrayList<Integer>();
 	private Random randGen = new Random();
-	private static Logger logger = Logger.getLogger(MultiThreadsSync.class);
+	
 
 	Object o1 = new Object();
 	Object o2 = new Object();
