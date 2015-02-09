@@ -24,5 +24,3 @@ public class Singleton {
 	
 }
 
-//Finished 8:22
-
