@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 public class CountDown implements Runnable {
 
 	static private Logger logger = Logger.getLogger(CountDown.class.getName());
-
+	
 	private CountDownLatch cl;
 	private int id; 
 
