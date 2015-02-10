@@ -84,6 +84,7 @@ public class SimulateDeadlock {
 						d1.lock1.unlock();
 					}
 
+					
 					try {
 						Thread.sleep(25);
 					} catch (InterruptedException e) {
@@ -96,11 +97,14 @@ public class SimulateDeadlock {
 
 		t1.start();
 		t2.start();
+		
 
 		t1.join();
 		t2.join();
+		
 
 		System.out.println(d1.count1+d1.count2);
+		
 	}
 }
 
