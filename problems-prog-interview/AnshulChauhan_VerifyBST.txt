@@ -1,0 +1,20 @@
+static int previous=Integer.MIN_VALUE; //static variable to keep track of previous encountered variable
+public static boolean flag=true;	          //static flag to keep track whether we have found a smaller current value than previous one
+public static boolean findBST(Tree node) {
+	
+	if(node==null || flag==false)  	//if flag is already set to false no use to continue further, this will save some processing time
+		return flag;
+	
+	else { 					//else perform an inorder traversal and instead of printing, check current value with previous value
+	flag= findBST(node.left);
+	
+	if(node.value<previous)
+		flag=false;				//set flag to false as soon as we encounter a smaller variable
+	else
+		previous=node.value;	        //else set the current value as previous value
+	
+	flag = findBST(node.right);
+	}
+	return flag;
+}
+
