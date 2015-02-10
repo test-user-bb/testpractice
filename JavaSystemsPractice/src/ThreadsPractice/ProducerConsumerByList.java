@@ -9,6 +9,7 @@ public class ProducerConsumerByList {
 	private static LinkedList<Integer> list = new LinkedList<Integer>();
 	private static int MAX=20;
 
+	
 	private static Object lock = new Object();
 
 	private static void producer() throws InterruptedException{
@@ -46,6 +47,7 @@ public class ProducerConsumerByList {
 	}
 
 	public static void main(String[] args){
+		
 		
 		new Thread(new Runnable() {
 			
