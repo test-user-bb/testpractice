@@ -1,4 +1,4 @@
-package com.bawankar.niraj;
+package com.bawankar.niraj.javapractice;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
