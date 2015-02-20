@@ -1,7 +1,15 @@
 import java.util.Arrays;
 
 
-// 1:05 PM : 1:30 1:47
+// 1:05 PM : 1:30 1:47 1:58  ( 30 mins)
+
+/**
+ * 1. permutations
+ * 2. handling duplicates
+ * 3. Make sure to print original string.
+ * 4. Using the same array and hance swapping back after the call over.
+ * 
+ */
 
 public class StringPermutations {
 
