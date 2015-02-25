@@ -1,6 +1,7 @@
 class Tree{
-	Tree treeLeft,treeright;
+	public Tree treeLeft,treeright;
 	int data;
+	public Tree left,right;
 
 	Tree(int data){
 		this.data=data;

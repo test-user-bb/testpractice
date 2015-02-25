@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//4:15 AM.
+//4:15 AM to 5 PM, with little bit concern, but alomst done correctly.
 // No DP, but a general recursive descending solution.
 
 
@@ -23,11 +23,11 @@ public class ArraySubsets {
 
 	public static void main(String[] args) {
 
-		getTheSubsets(new int[] {1,2,3,4});
+		getTheSubsets(new int[] {1,2,3,4,5,6,7,8,9});
 	}
 
 	public static void getTheSubsets(int[] arr){
-		getTheSubsets(arr,0,1,null);
+		getTheSubsets(arr,0,2,null);
 	}
 
 	public static void getTheSubsets(int[] arr, int start, int itemsToAddInSubset, List<Integer> subsetItem){
