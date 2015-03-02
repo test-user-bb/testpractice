@@ -1,0 +1,4052 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+
+
+<head>
+    <title>
+        
+    java source code for decision tree algorithm
+
+    </title>
+    
+    <meta name="description" content="java source code for decision tree algorithm" />
+    <meta property="og:type" content="Article" />
+<meta property="og:title" content="java source code for decision tree algorithm" />
+<meta property="og:url" content="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" />
+
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="generator" content="WordPress" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/content/twitterbootstrap/css/bootstrap.min.css"
+        rel="stylesheet" type="text/css" />
+    
+    <link href="/content/twitterbootstrap/css/jquery.ui.core.css"
+        rel="stylesheet" type="text/css" media="screen" />
+    <link href="/content/twitterbootstrap/css/jquery.ui.theme.css"
+        rel="stylesheet" type="text/css" media="screen" />
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- Styles -->
+    <link href="/Content/twitterbootstrap/css/socialize-learning-custom.css"
+        rel="stylesheet" type="text/css" />
+    <script src="/Content/Scripts/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="/Content/Scripts/jquery-ui-1.8.19.min.js" type="text/javascript"></script>
+    <script src="/Content/Scripts/jquery.ui.core.min.js" type="text/javascript"></script>
+    <script src="/Scripts/modernizr-2.6.2.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.validate.min-1.9.0.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.validate.unobtrusive.js" type="text/javascript"></script>
+    <script src="/Content/twitterbootstrap/js/bootstrap.min.js"
+        type="text/javascript"></script>
+    <script src="/Content/twitterbootstrap/scripts/jquery.blockUI.js"
+        type="text/javascript"></script>
+    <script src="/Content/scripts/mvc.jquery.extends.js" type="text/javascript"></script>
+    <!-- begin script for google analytics -->
+        <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+
+    </script>
+    <script type="text/javascript">
+        var pageTracker = _gat._getTracker("UA-114801-1");
+        pageTracker._initData();
+        pageTracker._trackPageview();
+
+    </script>
+    <!-- end script for google analytics -->
+    <!-- begin rss feeds -->
+    <link rel="alternate" type="application/rss+xml" title=" 75,000+ Members Members RSS Feed"
+        href="http://www.kdkeys.net/feed/" />
+    <link rel="alternate" type="application/atom+xml" title=" 75,000+ Members Members Atom Feed"
+        href="http://www.kdkeys.net/feed/atom/" />
+    <!-- end rss feeds -->
+    
+    <script type="text/javascript">
+        $(function () {
+            $(".star").mouseover(function () {
+                var span = $(this).parent("span");
+                var newRating = $(this).attr("value");
+                setRating(span, newRating);
+            });
+
+            $(".star").mouseout(function () {
+                var span = $(this).parent("span");
+                var rating = span.attr("rating");
+                setRating(span, rating);
+            });
+
+
+            $(".star").click(function () {
+                var span = $(this).parent("span");
+                var newRating = $(this).attr("value");
+                var postID = span.attr("post");
+                var text = span.children("span");
+                $.post("/Post/SetRating", { id: postID, rating: newRating },
+                        function (obj) {
+                            if (obj.Success) {
+                                text.html("Rating: " + obj.Result.Rating + " (" + obj.Result.Raters + " votes cast)"); //modify the text
+                                span.attr("rating", obj.Result.Rating); //set the rating attribute
+                                setRating(span, obj.Result.Rating); //update the display
+                                //alert("Thank you, your vote was casted successfully.");
+                            }
+                            else {
+                                //alert(obj.Message); //failure, show message
+                            }
+                        }
+                );
+            });
+
+        });
+
+        function setRating(span, rating) {
+            span.find('img').each(function () {
+                var value = parseFloat($(this).attr("value"));
+                var imgSrc = $(this).attr("src");
+                if (value <= rating)
+                    $(this).attr("src", imgSrc.replace("-off.gif", "-on.gif"));
+                else
+                    $(this).attr("src", imgSrc.replace("-on.gif", "-off.gif"));
+            });
+        }
+    </script>
+    <script type="text/javascript">
+        function ReplyPost(parentPostID, replyPostID, postTitle) {
+
+            $('.enter_the_verification_word').hide();
+            $(".enter_the_verification_word").css("display", "none");
+
+            $("#SubmitAReplySection #ParentPostID").val(parentPostID);
+            $("#SubmitAReplySection #ReplyPostID").val(replyPostID);
+            $("#SubmitAReplySection #Title").val(postTitle);
+
+            $("#SubmitAReplySection #oper").val("add");
+
+            $("#SubmitAReplySection").show();
+            $('#highlight-SubmitAReply').hide();
+            //$('#SubmitAReplySection').unblock();
+            return false;
+        }
+
+        function ReplyPostAsJson(id) {
+
+            $('.enter_the_verification_word').hide();
+            $(".enter_the_verification_word").css("display", "none");
+
+            var dataUrl = 'http://www.kdkeys.net/' + 'Post/GetReplyAsJson/' + id;
+            $.get(dataUrl, function (data) {
+                PushSubmitAReplyData(data);
+            });
+
+            $("#SubmitAReplySection").show();
+            $('#highlight-SubmitAReply').hide();
+            //$('#SubmitAReplySection').unblock();
+            return false;
+        }
+
+        function PushSubmitAReplyData(data) {
+            $('.enter_the_verification_word').hide();
+            for (record in data) {
+                $("#SubmitAReplySection #" + record).val(data[record]);
+            }
+            $("#SubmitAReplySection #oper").val("add");
+        }
+
+        $(function () {
+            $('#SubmitAReplyButton').on('click', function () {
+
+                $('.enter_the_verification_word').hide();
+                $(".enter_the_verification_word").css("display", "none");
+
+                if ($('#SubmitAReplyForm').valid()) {
+
+                    $('#SubmitAReplySection').block({ baseZ: 1000, allowBodyStretch: true, timeout: 20000, cursor: 'wait', css: { width: '100%', backgroundColor: '#EEE' }, message: '<div class="loadwait"><img src="http://www.kdkeys.net/content/images/loading.gif" /> Please Wait ...</div>' });
+                    var heading = 'Post A Reply';
+                    var question_error = 'An error occured and your message was not submitted. Please contact the administrator or try again later!';
+                    var cancelButtonTxt = 'Cancel';
+                    var okButtonTxt = 'OK';
+
+                    var callbackOK = function () {
+                        $("#SubmitAReplySection").hide();
+                    };
+                    var callbackCancel = function () {
+                        $("#SubmitAReplySection").hide();
+                    };
+
+
+                    var data = $('#SubmitAReplyForm').serialize();
+                    var dataUrl = 'http://www.kdkeys.net/' + 'Post/SubmitAReplyAsJson';
+                    $.post(dataUrl, data, function (result) {
+                        if (result.Success) {
+                            clearForm($('#SubmitAReplyForm'), []);
+                            ShowOKCancelModal(heading, result.Success_Message, cancelButtonTxt, okButtonTxt, callbackOK, callbackCancel);
+                            $("#SubmitAReplySection").hide();
+                        }
+                        else {
+                            ShowOKCancelModal(heading, question_error, cancelButtonTxt, okButtonTxt, callbackOK, callbackCancel);
+                        }
+                    });
+
+                    $.unblockUI({ fadeOut: 2000 });
+                }
+                else {
+                    //$('.enter_the_verification_word').show();
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('.tiny_mce').each(function () {
+                var input = '#' + this.id;
+                var count = 'div[id*="' + this.id + '_count_' + '"]'; 
+                word_count(input, count);
+                $(this).keyup(function () { word_count(input, count) });
+            });
+        });
+
+        function word_count(field, count) {
+
+            var number = 0;
+            var matches = $(field).val().match(/\b/g);
+
+            if (matches) {
+                number = matches.length / 2;
+            }
+
+            $(count).text(field.replace('#', '') + ' : ' + number + ' Word' + (number != 1 ? 's' : '') + ' ');
+        }
+
+
+        /** begin end social buttons **/
+
+        $(function () {
+            //LinkedIn
+		    loadLinkedIn();
+
+            //Google +1
+            $.getScript("http://apis.google.com/js/plusone.js", null, true);
+
+            //Twitter
+            $.getScript("http://platform.twitter.com/widgets.js", null, true);
+
+            //Facebook
+            $.getScript("http://connect.facebook.net/en_US/all.js#xfbml=1", function () {
+
+                $('body').append('<div id="fb-root"></div>');
+
+                FB.init({ status: true, cookie: true, xfbml: true });
+
+            }, true);
+        });
+
+        /** end social buttons **/
+
+        /** BEGIN LOAD LINKEDIN **/
+        function loadLinkedIn()
+        {
+	        if (typeof (IN) != 'undefined') {
+	            IN.parse();
+	        } else {
+	           $.getScript("http://platform.linkedin.com/in.js");
+	        }
+        }
+        /** END LOAD LINKEDIN **/
+
+        /** BEGIN FILE DOWNLOADS **/
+
+        var download_file_html = 
+        '<div class="input-append">' +
+            '<button type="submit" class="btn btn-warning btn-small" name="downloadfile" id="downloadfile"'+
+                'onclick=" return false;">' +
+                '<i class="icon icon-white icon-download"></i>&nbsp;&nbsp;download</button>' +
+        '</div>';
+                                // var download_file_html = '<i class="icon icon-download"></i>';                    
+                       // $(download_file_html).appendTo("span.more-buttons");
+        
+
+
+        $(function () {
+            var dataUrl = 'http://www.kdkeys.net/' + 'file/hasfiles/' + 1381;
+            $.ajax({
+                url: dataUrl,
+                type: 'GET',
+                async: false,
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                
+                success: function (data) {
+                    $.each(data, function (id, val) {
+                        ///alert(id.toString() + ' ' + val.toString());
+                    });
+                }
+                    
+                        , error: function (response) {
+                            //console.log(response);
+                        }
+            });
+        });
+
+/** END FILE DOWNLOADS **/
+
+     $(function () {
+            $('a[rel="popover"]').popover();
+        });
+
+        /** BEGIN ADD A REFERENCE LINK **/
+        function AddReference(id){    
+                $('#AddAReferenceSection').show();
+                return false;
+            } //end function
+
+
+     $(function () {
+            $('#AddAReferenceButton').on('click', function () {
+                if ($('#AddAReferenceForm').valid()) {
+
+                    $('#AddAReferenceSection').block({ baseZ: 1000, allowBodyStretch: true, timeout: 20000, cursor: 'wait', css: { width: '100%', backgroundColor: '#EEE' }, message: '<div class="loadwait"><img src="http://www.kdkeys.net/content/images/loading.gif" /> Please Wait ...</div>' });
+                    var heading = 'Add A Reference';
+                    var question_error = '<h4>An error occured and your reference / link was not submitted.</h4>';
+                    var cancelButtonTxt = 'Cancel';
+                    var okButtonTxt = 'OK';
+
+                    var callbackOK = function () {
+                        $("#AddAReferenceSection").hide();
+                    };
+                    var callbackCancel = function () {
+                        //$("#AddAReferenceSection").hide();
+                    };
+
+
+                    var data = $('#AddAReferenceForm').serialize();
+                    var dataUrl = 'http://www.kdkeys.net/' + 'Post/AddAReferenceLink';
+                    $.post(dataUrl, data, function (result) {
+                        if (result.Success) {
+                            clearForm($('#AddAReferenceForm'), ['TopicTitle','HostName','PostDate','LinkID','PostId','PermaLinkId']);
+                            ShowOKCancelModal(heading, result.Success_Message, cancelButtonTxt, okButtonTxt, callbackOK, callbackCancel);
+                            $("#AddAReferenceSection").hide();
+                        }
+                        else {
+                            
+                            if(result.errors.length > 0)
+                            {
+                                question_error += '<ul>';
+
+                                for (var i = 0; i < result.errors.length; i++) {
+                                    question_error += '<li> ' + result.errors[i] + ' </li>';
+                                }
+
+                                question_error += '</ul>';
+                            }
+
+                            ShowOKCancelModal(heading, question_error, cancelButtonTxt, okButtonTxt, callbackOK, callbackCancel);
+                        }
+                    });
+
+                    $.unblockUI({ fadeOut: 1000 });
+                }
+                else {
+                    //$('.enter_the_verification_word').show();
+                }
+            });
+        });
+
+        /** BEGIN STYLES **/
+        $(document).ready(function() {
+                   var faqColor = 'faqColorGreen';
+                $(".lead h3, .comment-feeditem h3").each(function(i) {
+                    var index = String(i + 1);
+                    if (index.charAt(0)=='1') faqColor = 'faqColor'; else if (index.charAt(0)=='2') faqColor = 'faqColorBlue'; else if (index.charAt(0)=='3') faqColor = 'faqColorGreen';
+                    else if (index.charAt(0)=='4') faqColor = 'faqColorGrey'; else if (index.charAt(0)=='5') faqColor = 'faqColorLightCoral';
+                    else if (index.charAt(0)=='6') faqColor = 'faqColorMoccasin'; else if (index.charAt(0)=='7') faqColor = 'faqColorNavy';
+                    else if (index.charAt(0)=='8') faqColor = 'faqColorBlack'; else if (index.charAt(0)=='9') faqColor = 'faqColorIvory';
+                    else if (index.charAt(0)=='10') faqColor = 'faqColorLightSeaGreen'; else faqColor = faqColor;
+
+                    $(this).html('<span class="faqCounter ' + faqColor + '">' + index + '</span>' + $(this).text());
+                });
+              });
+        /** END STYLES **/
+    </script>
+    <script src="/Scripts/autogrow.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            //Auto Grow
+            $('textarea').autogrow();
+            $('textarea').css('overflow', 'hidden').autogrow();
+        });
+
+        $(function () {
+            $(".comment-feeditem").mouseover(function () {
+                $(this).addClass('comment-hover');
+            });
+            $(".comment-feeditem").mouseout(function () {
+                $(this).removeClass('comment-hover');
+            });
+        });
+
+        $(function () {
+            var newsletter = '0'
+            var id = '1381';
+
+            if (Number(newsletter) == 1) {
+                $.post("/Post/GetEmailNewsletter", { id: id },
+                        function (obj) {
+                            var emailId = obj.EmailNewsletterID;
+                            if (Math.round(emailId) == Number(emailId) && Number(emailId) > 0) {
+                                $.post('Post/ShowEmailNewsletter/' + emailId, function (data) {
+                                    $('#EmailNewsletterSection').replaceWith(data);
+                                });
+                            }
+                        }
+                );
+            }
+            else {
+
+            }
+        });     
+    </script>
+
+</head>
+<body>
+    <!-- Tweet Post Page -->
+    <!-- Begin Top Navbar -->
+    
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar">
+                </span>
+            </button>
+            <ul class="nav menuWebTitle">
+                <li class="menuWebTitle">
+                    
+                    <a class="brandings" href="http://www.kdkeys.net">
+                        <img src="/Content/twitterbootstrap/img/logo-20p.png" title="Ask A Data Miner -  75,000+ Members"
+                            alt="Ask A Data Miner -  75,000+ Members" />&nbsp;Ask A Data Miner -  75,000+ Members</a>
+                    
+                </li>
+            </ul>
+            <div class="nav-collapse collapse">
+                <ul class="nav">                    
+                    <li class="menuMyProfile">
+                        <a href="/member/myprofile">My Profile</a></li>
+                    <li class="menuSubmitNews"><a href="http://www.kdkeys.net/submit-news">
+                        Submit News</a> </li>
+                    <li class="menuContactUs"><a href="http://www.kdkeys.net/contact-us">Contact
+                        Us</a> </li>
+                    <li class="menuAskAQuestion"><a href="http://www.kdkeys.net/ask-a-question">
+                        Ask A Question</a> </li>
+                    
+                    <li class="menuMoreInformation"><a href="http://www.feedblitz.com/f/?Sub=165629">More Information</a>
+                    </li>
+                    
+                    <li class="menuTopRight">
+                        
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- End Top Navbar -->
+    <!-- Begin Container -->
+    <div class="container-fluid">
+        <!-- Begin Content -->
+        <div class="content">
+            <!-- Begin Level-1 -->
+            <!-- Page title-->
+            <div class="row-fluid center">
+                <!-- begin main content ................................. -->
+                <div class="span8">
+                    <!-- begin banner -->
+                    <div class="row-fluid">
+                        <!-- BEGIN BANNER 728 -->
+                        
+    
+<div class="row-fluid">
+    <div class="span12">
+        <div id="banner-728" class="banner728">
+            
+            <a href="http://www.feedblitz.com/f/?Sub=165629">
+                <img src="http://www.kdkeys.net/styles/images/banners-720x90b-toughest-challenge.jpg"
+                    alt="ASk A Question" border="0" /></a>
+            
+        </div>
+        <div id="carouselSlider" class="carousel slide banner728" style="min-height: 120px;
+            max-height: 120px; overflow:hidden; display:none;">
+            <div class="carousel-inner">
+                <div id="fragment--1" class="item">
+                    <ul class="thumbnails">
+                        <li class="span12">
+                            <div class="thumbnail">
+                                <img src="http://images.kdkeys.net/content/images/banners-720x90b-toughest-challenge.jpg"
+                                    alt="Ask A Question ... 100% Free!" title="Ask A Question ... 100% Free!" style="max-height: 90px;" />
+                                <div>
+                                    <h5>
+                                        <a href="http://www.kdkeys.net/ask-a-question">What Is The Toughest Challenge Facing Your Career? Get Help or Answers Here. Ask A Question ... 100% Free!</a></h5>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        $.ajax({
+            url: '/banner/GetPost/' + '0' + '/?count=9' + '&showTaxonomy=true',
+            type: 'GET',
+            async: false,
+            dataType: 'json',
+            success: function (result) {
+
+                if (result.Success) {
+
+                    drawCarousel(result.Banners);
+
+                    $('.carousel').carousel({
+                        interval: 5500
+                    });
+
+                    setTimeout(HideBanner, 5000);
+                }
+                else {
+                    $('#carouselSlider').hide();
+                    $('#banner-728').show();
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $('#carouselSlider').hide();
+                $('#banner-728').show();
+            }
+        });
+    });
+
+    function HideBanner() {
+        $('#carouselSlider').show();
+        $('#banner-728').hide();
+    }
+
+    function drawCarousel(banners) {
+        var temp;
+        var imageUrl = 'http://images.kdkeys.net';
+        temp = [];
+        var item_position = 0;
+        var index_closed = true;
+
+        $.each(banners, function (index, val) {
+            //Add Tab
+            //Add Content
+            item_position = index;
+
+            if (index == 0 || index == 3 || index == 6) {
+                temp.push('<div id="fragment-' + index + '" class="item">');
+                temp.push(' <ul class="thumbnails">');
+                index_closed = false;
+            }
+
+            temp.push('     <li class="span4">');
+            temp.push('         <div class="thumbnail"><img src="' + imageUrl + val.MediumImageURL + '" alt="' + val.FullImageTitle + '" title="' + val.FullImageTitle + '" style="max-height:90px;" />');
+
+            temp.push('         <div>');
+            temp.push('             <h5><a href="' + val.URL + '" >' + val.FullImageTitle + '</a></h5>');
+            temp.push('         </div>');
+
+            temp.push('         </div>');
+
+            temp.push('     </li>');
+
+            if (index == 2 || index == 5 || index == 8) {
+                temp.push(' </ul>');
+                temp.push('</div>');
+                index_closed = true;
+            }
+        });
+
+        if (index_closed == false) {
+            temp.push(' </ul>');
+            temp.push('</div>');
+        }
+
+        $('#carouselSlider .carousel-inner').append(temp.join(''));
+    }
+
+
+</script>
+
+
+                        <!-- END BANNER 728 -->
+                    </div>
+                    <!-- end banner -->
+                    
+    <h1>
+        <a href="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm"><i class="icon-eye-open icon-white">
+        </i>&nbsp;java source code for decision tree algorithm
+        </a>
+    </h1>
+    <!--BEGIN SOCIAL SHARING BUTTONS -->
+    <div class="social"><span class="social-google"><div class="g-plusone" data-href="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" data-size="medium"></div></span><span class="social-twitter"><a class="twitter-share-button" data-count="horizontal" data-text="java source code for decision tree algorithm" data-url="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" data-via="ITCareerCoach" href="https://twitter.com/share">Tweet</a></span><span class="social-facebook"><div class="fb-like" data-font="arial" data-href="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" data-layout="button_count" data-send="false" data-show-faces="false"></div></span><span class="social-linkedin"><script data-counter="right" data-url="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" type="in/share"></script></span><span class="more-buttons"></span></div>
+    <!--END SOCIAL SHARING BUTTONS -->
+    <!--BEGIN RATINGS -->
+    <span class='rating' rating='4.25' post='1381' title='Be the first to Rate this'><img src='/Content/images/star-left-on.gif' alt='star' width='5' height='12' class='star' value='0.5' /><img src='/Content/images/star-right-on.gif' alt='star' width='5' height='12' class='star' value='1' /><img src='/Content/images/star-left-on.gif' alt='star' width='5' height='12' class='star' value='1.5' /><img src='/Content/images/star-right-on.gif' alt='star' width='5' height='12' class='star' value='2' /><img src='/Content/images/star-left-on.gif' alt='star' width='5' height='12' class='star' value='2.5' /><img src='/Content/images/star-right-on.gif' alt='star' width='5' height='12' class='star' value='3' /><img src='/Content/images/star-left-on.gif' alt='star' width='5' height='12' class='star' value='3.5' /><img src='/Content/images/star-right-on.gif' alt='star' width='5' height='12' class='star' value='4' /><img src='/Content/images/star-left-off.gif' alt='star' width='5' height='12' class='star' value='4.5' /><img src='/Content/images/star-right-off.gif' alt='star' width='5' height='12' class='star' value='5' /> <span>Rating: 4.2/5 (2 votes cast)</span></span>
+    <!--END RATINGS -->
+    <!--BEGIN PRINTING -->
+    <span class='print'><a id='print-1381' name='print-1381' class='print' href='http://www.kdkeys.net/print/java-source-code-for-decision-tree-algorithm' title='print: java source code for decision tree algorithm' target='_blank'><img src='/styles/images/print.png' alt='print' width='24' height='24' class='print' /></a></span>
+    <!--END PRINTING -->
+
+                    <!-- begin post -->
+                    <div class="post">
+                        
+    
+    <div class="row-fluid">
+        <div class="span12">
+            <!-- BEGIN IMAGE PLACEHOLDER -->
+            
+            <!--END IMAGE PLACEHOLDER -->
+            <div id="post_detail-1381">
+                <!-- BEGIN POST CONTENT -->
+                <P>can someone give me the java source code for decision tree algorithm.</P><br/><P>I am doing a project in datamining.I need to differentiate user from intruder using this decision tree algorithm.</P><br/><P>Please help me with the source code</P><br/><P>&nbsp;</P>
+                <!--END POST CONTENT  -->
+            </div>
+            <a name="comment-1381"></a>
+            <!--BEGIN SUBSCRBER PHOTO -->
+            
+            <!-- END SUBSCRIBER PHOTO -->
+        </div>
+    </div>
+    <!--BEGIN SOCIAL SHARING BUTTONS -->
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="social-wide"><span class="social-google"><div class="g-plusone" data-href="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" data-size="medium"></div></span><span class="social-twitter"><a class="twitter-share-button" data-count="horizontal" data-text="java source code for decision tree algorithm" data-url="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" data-via="ITCareerCoach" href="https://twitter.com/share">Tweet</a></span><span class="social-facebook"><div class="fb-like" data-font="arial" data-href="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" data-layout="button_count" data-send="false" data-show-faces="false"></div></span><span class="social-linkedin"><script data-counter="right" data-url="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" type="in/share"></script></span><span class="more-buttons"></span></div>
+        </div>
+    </div>
+    <!--END SOCIAL SHARING BUTTONS -->
+    <!--BEGIN FEED INFO -->
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="feedinfo-single">
+                
+                &nbsp;<i class="icon-search icon-user icon-black"></i>:
+                <a href="/member/alicej-1723">alicej</a>
+                
+                &nbsp;
+                <!-- BEGIN LOCATION -->
+                
+                <!-- END LOCATION -->
+                &nbsp;
+                <a class="btn btn-info" href="/Post/Reply/1381?ReplyPostID=1381&amp;section=comments" onclick="ReplyPost(&#39;8333&#39;, &#39;1381&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                
+                &nbsp;
+                <!-- BEGIN REFERENCES -->
+                <button type="submit" class="btn" name="AddReferenceButton" id="AddReferenceButton"
+                    onclick="AddReference(1381); return false;">
+                    <i class="icon-plus"></i>&nbsp;Add A Reference</button>
+                <!-- END REFERENCES -->
+                
+            </div>
+        </div>
+    </div>
+    <!--END FEED INFO -->
+    <!-- BEGIN TAXONOMIES -->
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="taxonomyinfo-single">
+                <div class='tag-list'><a class='category' href='http://www.kdkeys.net/category/data-mining' title='Data Mining'>Data Mining</a><a class='category' href='http://www.kdkeys.net/category/data-mining-source-code-download' title='Data Mining Source Code Download'>Data Mining Source Code Download</a></div>
+            </div>
+        </div>
+    </div>
+    <!-- END TAXONOMIES -->
+    <!-- BEGIN LIST REFERENCES -->
+    
+    <!-- END LIST REFERENCES -->
+    
+    <!--- begin comments list section -->
+    <div class="row-fluid">
+        <div class="span12">
+            <h3 class="comments_title">
+                Replies
+                (33)</h3>
+        </div>
+    </div>
+    <!--- end comments list section -->
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-7957"></a>
+                    <div id="comment_detail-7957">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>did u have in.txt file belongs to java source code for decision tree algorithm</p><p>if u have that file please send that &nbsp;to my Id laxmi.jhansi@gmail.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="jhansi">
+                            <a href="/member/jhansi-3237">jhansi</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=7957" onclick="ReplyPost(&#39;1381&#39;, &#39;7957&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-4717"></a>
+                    <div id="comment_detail-4717">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Did you manage to obtain the in.txt file? Could you please send it to me? Email addr: cioranel86@yahoo.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Adina">
+                            <a href="/member/adina-2699">Adina</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=4717" onclick="ReplyPost(&#39;1381&#39;, &#39;4717&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9745"></a>
+                    <div id="comment_detail-9745">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>i am doing a project in decision tree induction.. can u plz give me the coding??</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="JAYABHARATHI">
+                            <a href="/member/jayabharathi-4796">JAYABHARATHI</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9745" onclick="ReplyPost(&#39;8333&#39;, &#39;9745&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9776"></a>
+                    <div id="comment_detail-9776">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>could anybody tel me which input file format this code accepts. i am working with stock market data. the input file contains more than 3 attributes, yet error comes saying "expecting at least 1 attribute". please help me with this. email: ashwin9960@yahoo.com</p><p></p><p>regards</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="ashwin">
+                            <a href="/member/ashwin-4853">ashwin</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9776" onclick="ReplyPost(&#39;8333&#39;, &#39;9776&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9827"></a>
+                    <div id="comment_detail-9827">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Hi.....</p><p>plz send in.txt file on the email </p><p>nasarulla.srn@gmail.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Nasarulla  R">
+                            <a href="/member/nasarulla-r-4925">Nasarulla  R</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9827" onclick="ReplyPost(&#39;8333&#39;, &#39;9827&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9880"></a>
+                    <div id="comment_detail-9880">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Hi...Will You Send Me txt file? thanks alot</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Rimbun">
+                            <a href="/member/rimbun-5001">Rimbun</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9880" onclick="ReplyPost(&#39;8333&#39;, &#39;9880&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9879"></a>
+                    <div id="comment_detail-9879">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Hi...Will You Send Me txt file? thanks alot</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Rimbun">
+                            <a href="/member/rimbun-5001">Rimbun</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9879" onclick="ReplyPost(&#39;8333&#39;, &#39;9879&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9872"></a>
+                    <div id="comment_detail-9872">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>pls help me for source code and the manual to my email: joedick4god@gmail.com thanks</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="dickson  joseph">
+                            <a href="/member/dickson-joseph-4991">dickson  joseph</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9872" onclick="ReplyPost(&#39;8333&#39;, &#39;9872&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9909"></a>
+                    <div id="comment_detail-9909">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>hi..plz send in.txt file on the email geeth.rose.joseph@gmail.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Geeth">
+                            <a href="/member/geeth-5028">Geeth</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            <i class="icon-search icon-globe icon-black"></i>:
+                            <a href="/country/location/india-5028?city=India">India</a>
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9909" onclick="ReplyPost(&#39;8333&#39;, &#39;9909&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-10053"></a>
+                    <div id="comment_detail-10053">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Could you please send me the .txt file.? </p><p>Email: kenimayur65@gmail.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Mayur  Keni">
+                            <a href="/member/mayur-keni-5136">Mayur  Keni</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=10053" onclick="ReplyPost(&#39;8333&#39;, &#39;10053&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-20962"></a>
+                    <div id="comment_detail-20962">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Hi.. would u please send me the in.txt at mai.nashaat_fci@yahoo.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="MaiNMohamed">
+                            <a href="/member/mainmohamed-5476">MaiNMohamed</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=20962" onclick="ReplyPost(&#39;8333&#39;, &#39;20962&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-20958"></a>
+                    <div id="comment_detail-20958">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>please mail the text file</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="kinjal  shah">
+                            <a href="/member/kinjal-shah-5472">kinjal  shah</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=20958" onclick="ReplyPost(&#39;8333&#39;, &#39;20958&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-7954"></a>
+                    <div id="comment_detail-7954">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>dear </p><p>alicej,</p><p>i'vea java code for id3 decision tree i wish it could helps u ,plz sent me your email so as i could sent it for you ,</p><p>you can contact me at mahmoudmedhat@gmail.com</p><p>mahmoud,</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="mahmoudmedhat">
+                            <a href="/member/mahmoudmedhat-1679">mahmoudmedhat</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=7954" onclick="ReplyPost(&#39;1381&#39;, &#39;7954&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-1">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-8991"></a>
+                    <div id="comment_detail-8991">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>hi, i need to do a project based on the following concept the code should generate the hoeffding tree when i give first set of records, when i give the second set it should update the first tree and visualize... reply ASAP pls</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="aaberie alice">
+                            <a href="/member/aaberie-alice-3865">aaberie alice</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=8991" onclick="ReplyPost(&#39;1381&#39;, &#39;8991&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-7942"></a>
+                    <div id="comment_detail-7942">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Dear alicej ,</p><p> here is the source code</p><p>#######################################################33</p><p>import java.io.*;</p><p>import java.util.*;</p><p>public class ID3</p><p>{</p><p>int numAttributes;</p><p>String []attributeNames;</p><p>Vector []domains;</p><p>/* The class to represent a data point consisting of numAttributes values </p><p>of attributes */</p><p>class DataPoint {</p><p>public int []attributes;</p><p>public DataPoint(int numattributes) {</p><p>attributes = new int[numattributes];</p><p>}</p><p>};</p><p>/* The class to represent a node in the decomposition tree.</p><p>*/</p><p>class TreeNode {</p><p>public double entropy;</p><p>public Vector data;</p><p>public int decompositionAttribute;</p><p>public int decompositionValue;</p><p>public TreeNode []children;</p><p>public TreeNode parent;</p><p>public TreeNode() {</p><p>data = new Vector();</p><p>}</p><p>};</p><p>TreeNode root = new TreeNode();</p><p>public int getSymbolValue(int attribute, String symbol) {</p><p>int index = domains[attribute].indexOf(symbol);</p><p>if (index < 0) {</p><p>domains[attribute].addElement(symbol);</p><p>return domains[attribute].size() -1;</p><p>}</p><p>return index;</p><p>}</p><p>public int []getAllValues(Vector data, int attribute) {</p><p>Vector values = new Vector();</p><p>int num = data.size();</p><p>for (int i=0; i< num; i++) {</p><p>DataPoint point = (DataPoint)data.elementAt(i);</p><p>String symbol = </p><p>(String)domains[attribute].elementAt(point.attributes[attribute] );</p><p>int index = values.indexOf(symbol);</p><p>if (index < 0) {</p><p>values.addElement(symbol);</p><p>}</p><p>}</p><p>int []array = new int[values.size()];</p><p>for (int i=0; i< array.length; i++) {</p><p>String symbol = (String)values.elementAt(i);</p><p>array[i] = domains[attribute].indexOf(symbol);</p><p>}</p><p>values = null;</p><p>return array;</p><p>}</p><p>public Vector getSubset(Vector data, int attribute, int value) {</p><p>Vector subset = new Vector();</p><p>int num = data.size();</p><p>for (int i=0; i< num; i++) {</p><p>DataPoint point = (DataPoint)data.elementAt(i);</p><p>if (point.attributes[attribute] == value) subset.addElement(point);</p><p>}</p><p>return subset;</p><p>}</p><p>public double calculateEntropy(Vector data) {</p><p>int numdata = data.size();</p><p>if (numdata == 0) return 0;</p><p>int attribute = numAttributes-1;</p><p>int numvalues = domains[attribute].size();</p><p>double sum = 0;</p><p>for (int i=0; i< numvalues; i++) {</p><p>int count=0;</p><p>for (int j=0; j< numdata; j++) {</p><p>DataPoint point = (DataPoint)data.elementAt(j);</p><p>if (point.attributes[attribute] == i) count++;</p><p>}</p><p>double probability = 1.*count/numdata;</p><p>if (count > 0) sum += -probability*Math.log(probability);</p><p>}</p><p>return sum;</p><p>}</p><p>public boolean alreadyUsedToDecompose(TreeNode node, int attribute) {</p><p>if (node.children != null) {</p><p>if (node.decompositionAttribute == attribute )</p><p>return true;</p><p>}</p><p>if (node.parent == null) return false;</p><p>return alreadyUsedToDecompose(node.parent, attribute);</p><p>}</p><p>public void decomposeNode(TreeNode node) {</p><p>double bestEntropy=0;</p><p>boolean selected=false;</p><p>int selectedAttribute=0;</p><p>int numdata = node.data.size();</p><p>int numinputattributes = numAttributes-1;</p><p>node.entropy = calculateEntropy(node.data);</p><p>if (node.entropy == 0) return;</p><p>for (int i=0; i< numinputattributes; i++) {</p><p>int numvalues = domains[i].size();</p><p>if ( alreadyUsedToDecompose(node, i) ) continue;</p><p>double averageentropy = 0;</p><p>for (int j=0; j< numvalues; j++) {</p><p>Vector subset = getSubset(node.data, i, j);</p><p>if (subset.size() == 0) continue;</p><p>double subentropy = calculateEntropy(subset);</p><p>averageentropy += subentropy * </p><p>subset.size();</p><p>}</p><p>averageentropy = averageentropy / numdata; // </p><p>Taking the weighted average</p><p>if (selected == false) {</p><p>selected = true;</p><p>bestEntropy = averageentropy;</p><p>selectedAttribute = i;</p><p>} else {</p><p>if (averageentropy < bestEntropy) {</p><p>selected = true;</p><p>bestEntropy = averageentropy;</p><p>selectedAttribute = i;</p><p>}</p><p>}</p><p>}</p><p>if (selected == false) return;</p><p>int numvalues = domains[selectedAttribute].size();</p><p>node.decompositionAttribute = selectedAttribute;</p><p>node.children = new TreeNode [numvalues];</p><p>for (int j=0; j< numvalues; j++) {</p><p>node.children[j] = new TreeNode();</p><p>node.children[j].parent = node;</p><p>node.children[j].data = getSubset(node.data, </p><p>selectedAttribute, j);</p><p>node.children[j].decompositionValue = j;</p><p>}</p><p>for (int j=0; j< numvalues; j++) {</p><p>decomposeNode(node.children[j]);</p><p>}</p><p>node.data = null;</p><p>}</p><p>public int readData(String filename) throws Exception {</p><p>FileInputStream in = null;</p><p>try {</p><p>File inputFile = new File(filename);</p><p>in = new FileInputStream(inputFile);</p><p>} catch ( Exception e) {</p><p>System.err.println( "Unable to open data file: " + filename + "n" + e);</p><p>return 0;</p><p>}</p><p>BufferedReader bin = new BufferedReader(new InputStreamReader(in) );</p><p>String input;</p><p>while(true) {</p><p>input = bin.readLine();</p><p>if (input == null) {</p><p>System.err.println( "No data found in the data file: " + filename + </p><p>"n");</p><p>return 0;</p><p>}</p><p>if (input.startsWith("//")) continue;</p><p>if (input.equals("")) continue;</p><p>break;</p><p>}</p><p>StringTokenizer tokenizer = new StringTokenizer(input);</p><p>numAttributes = tokenizer.countTokens();</p><p>if (numAttributes <= 1) {</p><p>System.err.println( "Read line: " + input);</p><p>System.err.println( "Could not obtain the names of attributes in the </p><p>line");</p><p>System.err.println( "Expecting at least one input attribute and one </p><p>output attribute");</p><p>return 0;</p><p>}</p><p>domains = new Vector[numAttributes];</p><p>for (int i=0; i < numAttributes; i++) domains[i] = new Vector();</p><p>attributeNames = new String[numAttributes];</p><p>for (int i=0; i < numAttributes; i++) {</p><p>attributeNames[i] = tokenizer.nextToken();</p><p>}</p><p>while(true) {</p><p>input = bin.readLine();</p><p>if (input == null) break;</p><p>if (input.startsWith("//")) continue;</p><p>if (input.equals("")) continue;</p><p>tokenizer = new StringTokenizer(input);</p><p>int numtokens = tokenizer.countTokens();</p><p>if (numtokens != numAttributes) {</p><p>System.err.println( "Read " + root.data.size() + " data");</p><p>System.err.println( "Last line read: " + input);</p><p>System.err.println( "Expecting " + numAttributes + " attributes");</p><p>return 0;</p><p>}</p><p>DataPoint point = new DataPoint(numAttributes);</p><p>for (int i=0; i < numAttributes; i++) {</p><p>point.attributes[i] = getSymbolValue(i, tokenizer.nextToken() </p><p>);</p><p>}</p><p>root.data.addElement(point);</p><p>}</p><p>bin.close();</p><p>return 1;</p><p>}</p><p>public void printTree(TreeNode node, String tab) {</p><p>int outputattr = numAttributes-1;</p><p>if (node.children == null) {</p><p>int []values = getAllValues(node.data, outputattr );</p><p>if (values.length == 1) {</p><p>System.out.println(tab + "t" + attributeNames[outputattr] + " = "" + </p><p>domains[outputattr].elementAt(values[0]) + "";");</p><p>return;</p><p>}</p><p>System.out.print(tab + "t" + attributeNames[outputattr] + " = {");</p><p>for (int i=0; i < values.length; i++) {</p><p>System.out.print(""" + domains[outputattr].elementAt(values[i]) + "" </p><p>");</p><p>if ( i != values.length-1 ) System.out.print( " , " );</p><p>}</p><p>System.out.println( " };");</p><p>return;</p><p>}</p><p>int numvalues = node.children.length;</p><p>for (int i=0; i < numvalues; i++) {</p><p>System.out.println(tab + "if( " + </p><p>attributeNames[node.decompositionAttribute] + " == "" +</p><p>domains[node.decompositionAttribute].elementAt(i) </p><p>+ "") {" );</p><p>printTree(node.children[i], tab + "t");</p><p>if (i != numvalues-1) System.out.print(tab + "} else ");</p><p>else System.out.println(tab + "}");</p><p>}</p><p>}</p><p>public void createDecisionTree() {</p><p>decomposeNode(root);</p><p>printTree(root, "");</p><p>}</p><p>/* main function */</p><p>public static void main(String[] args) throws Exception {</p><p>ID3 me = new ID3();</p><p>int status = me.readData("c:\\in.txt");</p><p>if (status <= 0) return;</p><p>me.createDecisionTree();</p><p>}</p><p>}</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="mahmoudmedhat">
+                            <a href="/member/mahmoudmedhat-1679">mahmoudmedhat</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=7942" onclick="ReplyPost(&#39;1381&#39;, &#39;7942&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-1">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-7955"></a>
+                    <div id="comment_detail-7955">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>hello <strong>mahmoudmedhat,</strong></p><p>&nbsp;</p><p>can you please upload the in.txt file, I want to see how is the display of the dataset. </p><p>&nbsp;</p><p>Thank you&nbsp;</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="alicealiciasarawak">
+                            <a href="/member/alicealiciasarawak-2957">alicealiciasarawak</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=7955" onclick="ReplyPost(&#39;1381&#39;, &#39;7955&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-1">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-5354"></a>
+                    <div id="comment_detail-5354">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>hi..</p><p>can you please upload the manual for this code...??it would be so helpful for me..</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="kavitha.a">
+                            <a href="/member/kavithaa-2942">kavitha.a</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=5354" onclick="ReplyPost(&#39;1381&#39;, &#39;5354&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-1">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-7956"></a>
+                    <div id="comment_detail-7956">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>do you have in.txt??? </p><p>honestly i&#39;m so curious about the result &gt;.&lt; </p><p>&nbsp;</p><p>   would you send to me to niken_dan@yahoo.com??</p><p>please.. <br /></p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="nQn">
+                            <a href="/member/nqn-3340">nQn</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=7956" onclick="ReplyPost(&#39;1381&#39;, &#39;7956&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-1">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-20945"></a>
+                    <div id="comment_detail-20945">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>hello mahmoudmedhat,,,,,could you please send me the {"c:\\in.txt"}.</p><p>I need it badly....</p><p>If you have a manual do send it.Pls</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="karmveer">
+                            <a href="/member/karmveer-5453">karmveer</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=20945" onclick="ReplyPost(&#39;1381&#39;, &#39;20945&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-4735"></a>
+                    <div id="comment_detail-4735">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Did you manage to obtain the in.txt file? Could you please send it to me?Email addr: deo.sushrut@gmail.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Sushrut">
+                            <a href="/member/sushrut-2715">Sushrut</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=4735" onclick="ReplyPost(&#39;1381&#39;, &#39;4735&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-4788"></a>
+                    <div id="comment_detail-4788">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Thanks for ur effort.Do you mind sending me the in.txt file? as i have practical on this algorithm.Email addr: ha_abdelaal@yahoo.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Hammam">
+                            <a href="/member/hammam-2753">Hammam</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=4788" onclick="ReplyPost(&#39;1381&#39;, &#39;4788&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-8838"></a>
+                    <div id="comment_detail-8838">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>great piece of code ..... can u please send the text file to anir412@yahoo.co.in</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Bua">
+                            <a href="/member/bua-3705">Bua</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=8838" onclick="ReplyPost(&#39;1381&#39;, &#39;8838&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-8965"></a>
+                    <div id="comment_detail-8965">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Can u have in.txt file regarding to this particular source code, kindly send me at faizan_mcs@yahoo.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Faizan Ahmed">
+                            <a href="/member/faizan-ahmed-3834">Faizan Ahmed</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=8965" onclick="ReplyPost(&#39;1381&#39;, &#39;8965&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9058"></a>
+                    <div id="comment_detail-9058">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>please send in.txt file</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="pritesh vora">
+                            <a href="/member/pritesh-vora-3935">pritesh vora</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9058" onclick="ReplyPost(&#39;1381&#39;, &#39;9058&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9087"></a>
+                    <div id="comment_detail-9087">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Hi alicej, I am also doing a project on Rainforest framework. Can u please mail me the mannual for the code. especially in decomposeNode(). Email: harsharaj45@gmail.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="Harsha  Raj">
+                            <a href="/member/harsha-raj-3968">Harsha  Raj</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9087" onclick="ReplyPost(&#39;1381&#39;, &#39;9087&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9173"></a>
+                    <div id="comment_detail-9173">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>can you send me in.txt file?</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="pritesh vora">
+                            <a href="/member/pritesh-vora-3935">pritesh vora</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9173" onclick="ReplyPost(&#39;1381&#39;, &#39;9173&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9187"></a>
+                    <div id="comment_detail-9187">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Pls send me the in.txt file. Thanks in advance.</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="bharathi">
+                            <a href="/member/bharathi-4080">bharathi</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9187" onclick="ReplyPost(&#39;1381&#39;, &#39;9187&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9209"></a>
+                    <div id="comment_detail-9209">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>hi alicej, can u plz send me in.txt file. Thanx in advance</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="pk">
+                            <a href="/member/pk-4103">pk</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9209" onclick="ReplyPost(&#39;1381&#39;, &#39;9209&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9240"></a>
+                    <div id="comment_detail-9240">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>can you send me in.txt file? plz send me in .txt.. advance thanks</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="mohiuddin  shamim">
+                            <a href="/member/mohiuddin-shamim-4142">mohiuddin  shamim</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9240" onclick="ReplyPost(&#39;1381&#39;, &#39;9240&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9270"></a>
+                    <div id="comment_detail-9270">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>Thank you so much for the code. Can you please upload the .txt file or can you ail it to aarthyalagar1@gmail.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="RT">
+                            <a href="/member/rt-4190">RT</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9270" onclick="ReplyPost(&#39;1381&#39;, &#39;9270&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9288"></a>
+                    <div id="comment_detail-9288">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>hi thank you for the source code.please send me in.txt email add azizi1368@gmail.com</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="mohammad">
+                            <a href="/member/mohammad-4207">mohammad</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9288" onclick="ReplyPost(&#39;1381&#39;, &#39;9288&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9316"></a>
+                    <div id="comment_detail-9316">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>will you please mail the code file in txt... because we getting some syntax errors.... :D :)</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="madhuri">
+                            <a href="/member/madhuri-4242">madhuri</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9316" onclick="ReplyPost(&#39;1381&#39;, &#39;9316&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span1">
+        </div>
+        <div class="span10">
+            <div class="feedlist comment-level-0">
+                <!-- begin feeditem -->
+                <div class="comment-feeditem">
+                    <a name="comment-9334"></a>
+                    <div id="comment_detail-9334">
+                        <!--BEGIN POST PHOTO -->
+                        
+                        <!-- END POST PHOTO -->
+                        <!--BEGIN SUBSCRBER PHOTO -->
+                        
+                        <!-- END SUBSCRIBER PHOTO -->
+                        <p>hi..plz send in.txt file on the email p096038@nu.edu.pk...thnx</p>
+                    </div>
+                    
+                    <!-- begin feedinfo -->
+                    <div class="feedinfo">
+                        
+                        <small><i class="icon-search icon-user icon-black"></i>:<cite title="khadija">
+                            <a href="/member/khadija-4284">khadija</a>
+                            
+                            <!-- BEGIN LOCATION -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- END LOCATION --></small>
+                        <a class="btn btn-info btn-mini" href="/Post/Reply/1381?ReplyPostID=9334" onclick="ReplyPost(&#39;1381&#39;, &#39;9334&#39; , &#39;java source code for decision tree algorithm&#39;);return false;">Reply</a>
+                        
+                    </div>
+                    <!-- end feedinfo -->
+                </div>
+                <!-- end feeditem -->
+            </div>
+        </div>
+        <div class="span1">
+        </div>
+        <!-- add hidden elemens -->
+        <!-- Button to trigger modal -->
+    </div>
+    <div>
+        <br />
+    </div>
+    
+    <!--- begin comments intro -->
+    <div class="row-fluid">
+        <div id="comments" class="span12">
+            <hr />
+        </div>
+    </div>
+    <!--- end comments intro -->
+    <div class="row-fluid">
+        <div class="span12">
+            <div id="replies">
+                
+<h3>
+    Post A Reply</h3>
+<form action="/Post/ReplyPost" enctype="multipart/form-data" method="post">
+<input name="__RequestVerificationToken" type="hidden" value="QgIbN7a6nE9yy13QywbDkwpl5zcJLbdOx-ZRMApbidowa8UOnSNKnnVq7ncvt2pAnBNwEx4KwfR3CpsIkw6iwXLsXBmDLDWE7qcUVYiSMIOCl8KkcwRyAK_lTsbkCIXsiT7qT-LZW-4u-zvcaaw-8b3DjqYTwM3UOpO_v2h_vns1" />
+<fieldset>
+    
+    <!-- BEGIN VISITOR -->
+    <div class="row-fluid">
+        <div class="span6">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="FirstName">Full Name (first and last name)</label>
+                </div>
+                <div class="editor-field">
+                    <input data-val="true" data-val-required="The Full Name (first and last name) field is required." id="FirstName" name="FirstName" style="width: 100%;" type="text" value="" />
+                    <span class="field-validation-valid" data-valmsg-for="FirstName" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+        <div class="span6">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="Email">Email Address</label>
+                </div>
+                <div class="editor-field">
+                    <input data-val="true" data-val-required="The Email Address field is required." id="Email" name="Email" style="width: 100%;" type="text" value="" />
+                    <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END VISITOR -->
+    
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="control-group">
+                <div class="editor-label" id="Message_count_635592166731251954">
+                    <label for="Message">Message</label>
+                </div>
+                <div class="editor-field">
+                    <textarea class="input-block-level tinymce word_count" cols="20" data-val="true" data-val-required="The Message field is required." id="Message" name="Message" rows="2">
+</textarea>
+                    <span class="field-validation-valid" data-valmsg-for="Message" data-valmsg-replace="true"></span>
+                </div>
+                <!-- Begin UPLOAD SECTION -->
+                <div class="alert alert-info">
+                    <input type="file" id="FileUpload" name="FileUpload" />
+                </div>
+                <!-- END UPLOAD SECTION -->
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <span id="label-captcha"><strong><label class="enter_the_verification_word" for="Enter_the_verification_word">Enter the verification word</label></strong></span><script type="text/javascript">
+		var RecaptchaOptions = {
+			theme : 'clean',
+			tabindex : 0
+		};
+
+</script><script type="text/javascript" src="http://api.recaptcha.net/challenge?k=6LfwmtoSAAAAALL7wll13Dj6XzdwJicOG2jB0M4m">
+
+</script><noscript>
+		<iframe src="http://api.recaptcha.net/noscript?k=6LfwmtoSAAAAALL7wll13Dj6XzdwJicOG2jB0M4m" width="500" height="300" frameborder="0">
+
+		</iframe><br>
+
+		</br><textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea><input name="recaptcha_response_field" value="manual_challenge" type="hidden" />
+</noscript>
+        </div>
+    </div>
+</fieldset>
+<input data-val="true" data-val-number="The field ParentPostID must be a number." data-val-required="The ParentPostID field is required." id="ParentPostID" name="ParentPostID" type="hidden" value="8333" />
+<input data-val="true" data-val-number="The field ReplyPostID must be a number." data-val-required="The ReplyPostID field is required." id="ReplyPostID" name="ReplyPostID" type="hidden" value="1381" />
+<input data-val="true" data-val-required="The Title (enter a descriptive subject) field is required." id="Title" name="Title" type="hidden" value="java source code for decision tree algorithm" />
+<input data-val="true" data-val-number="The field TaxonomyID must be a number." id="TaxonomyID" name="TaxonomyID" type="hidden" value="47" />
+
+<div class="row-fluid">
+    <div class="span12">
+        <input name="ReplyButton" type="submit" value="Post A Reply" class="btn btn-info btn-large" />
+    </div>
+</div>
+</form>
+            </div>
+        </div>
+    </div>
+    <!-- BEGIN SUBMIT A REPLY -->
+    <div class="row-fluid">
+        <div id="SubmitAReplySection" class="modal hide fade in" style="display: none;">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" onclick="$('#SubmitAReplySection').hide();">
+                    x</button>
+                <strong>Post A Reply</strong>
+            </div>
+            <div class="modal-body">
+                <div id="highlight-SubmitAReply" class="alert hide">
+                    <p id="SubmitAReplySaveResults">
+                        <span class="ui-icon ui-icon-success" style="float: left; margin-right: .3em;"></span>
+                        <span id="SubmitAReplySaveSpanResults"></span>
+                    </p>
+                </div>
+                <form id="SubmitAReplyForm" name="SubmitAReplyForm" action="add">
+                
+<input name="__RequestVerificationToken" type="hidden" value="XSAmSZHfhdt4faszDCl7n0krQGWurXC87PZokWGAyKafjfZd6qPhsvYM7fkhtVAAKfdck9dToQfp7zT6qc61VZ5sUxo3Ib1FGQb8YrtoQvSn8MPVIpz3RzEmEU6IRCKDxroyp3HuR-6Gob_z22OY_Esb1esZwS15KuHslFJl6fo1" />
+<fieldset>
+    
+    <!-- BEGIN VISITOR -->
+    <div class="row-fluid">
+        <div class="span6">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="FirstName">Full Name (first and last name)</label>
+                </div>
+                <div class="editor-field">
+                    <input data-val="true" data-val-required="The Full Name (first and last name) field is required." id="FirstName" name="FirstName" style="width: 100%;" type="text" value="" />
+                    <span class="field-validation-valid" data-valmsg-for="FirstName" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+        <div class="span6">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="Email">Email Address</label>
+                </div>
+                <div class="editor-field">
+                    <input data-val="true" data-val-required="The Email Address field is required." id="Email" name="Email" style="width: 100%;" type="text" value="" />
+                    <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END VISITOR -->
+    
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="control-group">
+                <div class="editor-label" id="Message_count_635592166731271485">
+                    <label for="Message">Message</label>
+                </div>
+                <div class="editor-field">
+                    <textarea class="input-block-level tinymce word_count" cols="20" data-val="true" data-val-required="The Message field is required." id="Message" name="Message" rows="2">
+</textarea>
+                    <span class="field-validation-valid" data-valmsg-for="Message" data-valmsg-replace="true"></span>
+                </div>
+                <!-- Begin UPLOAD SECTION -->
+                <div class="alert alert-info">
+                    <input type="file" id="FileUpload" name="FileUpload" />
+                </div>
+                <!-- END UPLOAD SECTION -->
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <span id="label-captcha"><strong><label class="enter_the_verification_word" for="Enter_the_verification_word">Enter the verification word</label></strong></span><script type="text/javascript">
+		var RecaptchaOptions = {
+			theme : 'clean',
+			tabindex : 0
+		};
+
+</script><script type="text/javascript" src="http://api.recaptcha.net/challenge?k=6LfwmtoSAAAAALL7wll13Dj6XzdwJicOG2jB0M4m">
+
+</script><noscript>
+		<iframe src="http://api.recaptcha.net/noscript?k=6LfwmtoSAAAAALL7wll13Dj6XzdwJicOG2jB0M4m" width="500" height="300" frameborder="0">
+
+		</iframe><br>
+
+		</br><textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea><input name="recaptcha_response_field" value="manual_challenge" type="hidden" />
+</noscript>
+        </div>
+    </div>
+</fieldset>
+<input data-val="true" data-val-number="The field ParentPostID must be a number." data-val-required="The ParentPostID field is required." id="ParentPostID" name="ParentPostID" type="hidden" value="8333" />
+<input data-val="true" data-val-number="The field ReplyPostID must be a number." data-val-required="The ReplyPostID field is required." id="ReplyPostID" name="ReplyPostID" type="hidden" value="1381" />
+<input data-val="true" data-val-required="The Title (enter a descriptive subject) field is required." id="Title" name="Title" type="hidden" value="java source code for decision tree algorithm" />
+<input data-val="true" data-val-number="The field TaxonomyID must be a number." id="TaxonomyID" name="TaxonomyID" type="hidden" value="47" />
+
+                <input id="oper" name="oper" type="hidden" value="" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn" onclick="$('#SubmitAReplySection').hide();">Close</a>
+                <input type="submit" name="SubmitAReplyButton" id="SubmitAReplyButton" class="btn btn-info btn-large"
+                    value="Submit A Reply" />
+            </div>
+        </div>
+    </div>
+    <!-- END SUBMIT A REPLY -->
+
+                        <!-- begin navigation tabs-->
+                        <!-- end navigation tabs-->
+                    </div>
+                    <!-- end post -->
+                </div>
+                <!-- begin right sidebar 1 content ................................. -->
+                <div class="span4">
+                    <!-- BEGIN Ask A Question -->
+                    <div class="row-fluid">
+                        <h1 class="qa">
+                            <a href="#AskAQuestionModal" role="button" class="btn btn-info btn-block btn-large"
+                                data-toggle="modal"><i class="icon-user icon-white"></i>&nbsp;Ask A Question</a>
+                        </h1>
+                    </div>
+                    <!-- END Ask A Question -->
+                    <!-- begin social connect -->
+                    <form method="post" action="http://www.feedblitz.com/f/f.fbz?AddNewUserDirect" target="_blank"
+                    class="form-search">
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <div class="social-connect input-prepend-not">
+                                <button type="submit" class="btn btn-inverse">
+                                    <i class="icon-envelope icon-white"></i>&nbsp;SignUp</button><input name="EMAIL"
+                                        type="text" value="Enter your email for newsletters" onfocus="this.value = '';" class="span12" />
+                                <input name="FEEDID" type="hidden" value="165629" />
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <h3 class="widget_title widget_social-connect">
+                                <i class="icon-heart"></i>&nbsp;Connect With Us</h3>
+                            <div class="social-connect">
+                                <p>
+                                    <a href="http://www.twitter.com/kingsleytagbo" title="Follow Us on Twitter">
+                                        <img src="http://www.kdkeys.net/styles/Images/twitter2.png" alt="Follow on Twitter">
+                                    </a><a href="http://www.twitter.com/kingsleytagbo" title="Follow Us on Twitter"><span
+                                        style="font-weight: bold;">Follow on Twitter </span></a>
+                                </p>
+                                <p>
+                                    <a href="http://www.kdkeys.net/feed" title="Subscribe to RSS Feed">
+                                        <img src="http://www.kdkeys.net/styles/images/rss2.png" alt="Subscribe to Feed">
+                                    </a><a href="http://www.kdkeys.net/feed" title="Subscribe to Feed"><span
+                                        style="font-weight: bold;">Subscribe to Feed</span></a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end social connect  -->
+                    <!-- begin search -->
+                    <div class="row-fluid">
+                        <form action="/search" class="form-search" id="searchForm" method="post" name="searchForm">
+                        <div class="span12">
+                            <div class="social-connect">
+                                <div class="input-prepend-not">
+                                    <button type="submit" class="btn btn-inverse" name="search-button" id="search-button">
+                                        <i class="icon-search icon-white"></i>&nbsp;Search</button><input type="text" class="required span12"
+                                            id="search" name="search" style="height: 30px;" />
+                                </div>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                    <!-- end search -->
+                    
+<div class="row-fluid center">
+    <h3 class="widget_title widget_highlight">
+        <i class="icon-eye-open icon-black"></i>&nbsp;Spotlight</h3>
+    
+    <div class="post-sideBar post-sideBarComments">
+        <div class="imageWrap">
+            <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/Content/Images/Thumbnails/4/80-thumbnail-4.jpg"
+                alt="Classification and Regression Trees  by Leo Breiman, Jerome H. Friedman, Et. Al." title="Classification and Regression Trees  by Leo Breiman, Jerome H. Friedman, Et. Al." />
+        </div>
+        <div class="post-spotlight">
+            <a title="Classification and Regression Trees  by Leo Breiman, Jerome H. Friedman, Et. Al." href="http://www.kdkeys.net/classification-and-regression-trees-by-leo-breiman-jerome-h-friedman-et-al">
+                Classification and Regression Trees  by Leo Breiman, Jerome H. Friedman, Et. Al.</a></div>
+    </div>
+    
+    <div class="post-sideBar post-sideBarComments">
+        <div class="imageWrap">
+            <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/Content/Images/Thumbnails/8/80-thumbnail-8.jpg"
+                alt="Data Mining Techniques : For Marketing, Sales, and Customer Relationship Management" title="Data Mining Techniques : For Marketing, Sales, and Customer Relationship Management" />
+        </div>
+        <div class="post-spotlight">
+            <a title="Data Mining Techniques : For Marketing, Sales, and Customer Relationship Management" href="http://www.kdkeys.net/data-mining-techniques-for-marketing-sales-and-customer-relationship-management">
+                Data Mining Techniques : For Marketing, Sales, and Customer Relationship Management</a></div>
+    </div>
+    
+    <div class="post-sideBar post-sideBarComments">
+        <div class="imageWrap">
+            <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/content/images/thumbnails/987/80-thumbnail-987.jpg"
+                alt="help needed on text discard" title="help needed on text discard" />
+        </div>
+        <div class="post-spotlight">
+            <a title="help needed on text discard" href="http://www.kdkeys.net/help-needed-on-text-discard">
+                help needed on text discard</a></div>
+    </div>
+    
+    <div class="post-sideBar post-sideBarComments">
+        <div class="imageWrap">
+            <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/content/images/thumbnails/8958/80-thumbnail-8958.jpg"
+                alt="FREE Webinar: Leverage Data Analytics on Thursday, January 31 at 1:00 PM EST" title="FREE Webinar: Leverage Data Analytics on Thursday, January 31 at 1:00 PM EST" />
+        </div>
+        <div class="post-spotlight">
+            <a title="FREE Webinar: Leverage Data Analytics on Thursday, January 31 at 1:00 PM EST" href="http://www.kdkeys.net/free-webinar-leverage-data-analytics-on-thursday-january-31-at-100-pm-est">
+                FREE Webinar: Leverage Data Analytics on Thursday, January 31 at 1:00 PM EST</a></div>
+    </div>
+    
+    <div class="post-sideBar post-sideBarComments">
+        <div class="imageWrap">
+            <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/content/images/thumbnails/2399/80-thumbnail-2399.jpg"
+                alt="urgent help needed on How to connect VB 6 form with Ms acess 2000 and Xp" title="urgent help needed on How to connect VB 6 form with Ms acess 2000 and Xp" />
+        </div>
+        <div class="post-spotlight">
+            <a title="urgent help needed on How to connect VB 6 form with Ms acess 2000 and Xp" href="http://www.kdkeys.net/urgent-help-needed-on-how-to-connect-vb-6-form-with-ms-acess-2000-and-xp">
+                urgent help needed on How to connect VB 6 form with Ms acess 2000 and Xp</a></div>
+    </div>
+    
+    <div class="post-sideBar post-sideBarComments">
+        <div class="imageWrap">
+            <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/Content/Images/Thumbnails/10/80-thumbnail-10.jpg"
+                alt="Neural Networks for Pattern Recognition By Christopher M. Bishop " title="Neural Networks for Pattern Recognition By Christopher M. Bishop " />
+        </div>
+        <div class="post-spotlight">
+            <a title="Neural Networks for Pattern Recognition By Christopher M. Bishop " href="http://www.kdkeys.net/neural-networks-for-pattern-recognition-by-christopher-m-bishop">
+                Neural Networks for Pattern Recognition By Christopher M. Bishop </a></div>
+    </div>
+    
+    <div class="post-sideBar post-sideBarComments">
+        <div class="imageWrap">
+            <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/Content/Images/Thumbnails/6/80-thumbnail-6.jpg"
+                alt="Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations" title="Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations" />
+        </div>
+        <div class="post-spotlight">
+            <a title="Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations" href="http://www.kdkeys.net/data-mining-practical-machine-learning-tools-and-techniques-with-java-implementations">
+                Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations</a></div>
+    </div>
+    
+    <div class="post-sideBar post-sideBarComments">
+        <div class="imageWrap">
+            <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/content/images/thumbnails/9923/80-thumbnail-9923.png"
+                alt="Time element to a prediction forecast " title="Time element to a prediction forecast " />
+        </div>
+        <div class="post-spotlight">
+            <a title="Time element to a prediction forecast " href="http://www.kdkeys.net/time-element-to-a-prediction-forecast">
+                Time element to a prediction forecast </a></div>
+    </div>
+    
+</div>
+
+                    
+<div class="row-fluid center">
+    <h3 class="widget_title widget_qa">
+        <i class="icon-question-sign icon-black"></i>&nbsp;Questions & Answers</h3>
+    <ul class="nav nav-tabs" id="PostQATabs">
+        <li class="active"><a href="#popular" data-toggle="tab">Popular</a></li>
+        <li><a href="#help" data-toggle="tab">Help</a></li>
+        <li><a href="#latest" data-toggle="tab">Latest</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="popular">
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            167</div>
+                        <span class="box_title"><a title="Writing a Data Mining code in VB" href="http://www.kdkeys.net/writing-a-data-mining-code-in-vb">
+                            Writing a Data Mining code in VB
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            97</div>
+                        <span class="box_title"><a title="need K-nearest neighbour source code in C/C++---URGENT" href="http://www.kdkeys.net/need-k-nearest-neighbour-source-code-in-cc-urgent">
+                            need K-nearest neighbour source code in C/C++---URGENT
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            58</div>
+                        <span class="box_title"><a title="Data Mining Project Quick Start Guide" href="http://www.kdkeys.net/data-mining-project-quick-start-guide">
+                            Data Mining Project Quick Start Guide
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            50</div>
+                        <span class="box_title"><a title="Open Source C#.NET Data Mining Project" href="http://www.kdkeys.net/open-source-c-net-data-mining-project">
+                            Open Source C#.NET Data Mining Project
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            47</div>
+                        <span class="box_title"><a title="Questions about my K-means C++ implementation" href="http://www.kdkeys.net/questions-about-my-k-means-c-implementation">
+                            Questions about my K-means C++ implementation
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            42</div>
+                        <span class="box_title"><a title="K-MEANS CLUSTERING ALGORITHM DATA MINING TUTORIAL" href="http://www.kdkeys.net/k-means-clustering-algorithm-data-mining-tutorial">
+                            K-MEANS CLUSTERING ALGORITHM DATA MINING TUTORIAL
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            36</div>
+                        <span class="box_title"><a title="Apriori &amp; FP growth algorithm in Java" href="http://www.kdkeys.net/apriori-p-growth-algorithm-in-java">
+                            Apriori &amp; FP growth algorithm in Java
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            35</div>
+                        <span class="box_title"><a title="Fuzzy Matching in Access" href="http://www.kdkeys.net/fuzzy-matching-in-access">
+                            Fuzzy Matching in Access
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            34</div>
+                        <span class="box_title"><a title="New - Hi - Inherited a VB Web mining Project - Help please" href="http://www.kdkeys.net/new-hi-inherited-a-vb-web-mining-project-help-please">
+                            New - Hi - Inherited a VB Web mining Project - Help please
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            33</div>
+                        <span class="box_title"><a title="Apriori C# Implementation Download" href="http://www.kdkeys.net/apriori-c-implementation-download">
+                            Apriori C# Implementation Download
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            33</div>
+                        <span class="box_title"><a title="Appropriate minimal support and minconf for itemset?" href="http://www.kdkeys.net/appropriate-minimal-support-and-minconf-for-itemset">
+                            Appropriate minimal support and minconf for itemset?
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            29</div>
+                        <span class="box_title"><a title="data mining using BIRCH algorithm using VB" href="http://www.kdkeys.net/data-mining-using-birch-algorithm-using-vb">
+                            data mining using BIRCH algorithm using VB
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            29</div>
+                        <span class="box_title"><a title="Apriori algorithm in VB" href="http://www.kdkeys.net/apriori-algorithm-in-vb">
+                            Apriori algorithm in VB
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            26</div>
+                        <span class="box_title"><a title="regarding .net pls. help " href="http://www.kdkeys.net/regarding-net-pls-help">
+                            regarding .net pls. help 
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            25</div>
+                        <span class="box_title"><a title=".NET Code Samples Wanted! Earn $100 to $200 per month Writing .NET Code In Your Spare Time" href="http://www.kdkeys.net/net-code-samples-wanted-earn-100-to-200-per-month-writing-net-code-in-your-spare-time">
+                            .NET Code Samples Wanted! Earn $100 to $200 per month Writing .NET Code In Your Spare Time
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            25</div>
+                        <span class="box_title"><a title="Retrieve the WindowsIdentity of the Current User for One Verification Check" href="http://www.kdkeys.net/retrieve-the-windowsidentity-of-the-current-user-for-one-verification-check">
+                            Retrieve the WindowsIdentity of the Current User for One Verification Check
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            24</div>
+                        <span class="box_title"><a title="CART, C4.5/5.0, CHAID, Logistic regression  ...source code wanted ..." href="http://www.kdkeys.net/cart-c4-55-0-chaid-logistic-regression-source-code-wanted">
+                            CART, C4.5/5.0, CHAID, Logistic regression  ...source code wanted ...
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            23</div>
+                        <span class="box_title"><a title="Source code for privacy data mining on classification" href="http://www.kdkeys.net/source-code-for-privacy-data-mining-on-classification">
+                            Source code for privacy data mining on classification
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            23</div>
+                        <span class="box_title"><a title="apriori algorithm in visual basic" href="http://www.kdkeys.net/apriori-algorithm-in-visual-basic">
+                            apriori algorithm in visual basic
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            23</div>
+                        <span class="box_title"><a title="Help me about your decision tree algorithm subject please " href="http://www.kdkeys.net/help-me-about-your-decision-tree-algorithm-subject-please">
+                            Help me about your decision tree algorithm subject please 
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            22</div>
+                        <span class="box_title"><a title="source code for implementing a k-means algorithm in data clustering using vb" href="http://www.kdkeys.net/source-code-for-implementing-a-k-means-algorithm-in-data-clustering-using-vb">
+                            source code for implementing a k-means algorithm in data clustering using vb
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            19</div>
+                        <span class="box_title"><a title="Data mining XML documents" href="http://www.kdkeys.net/data-mining-xml-documents">
+                            Data mining XML documents
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            18</div>
+                        <span class="box_title"><a title="ADO.NET : Bulk Insert Into A DataTable" href="http://www.kdkeys.net/ado-net-bulk-insert-into-a-datatable">
+                            ADO.NET : Bulk Insert Into A DataTable
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            18</div>
+                        <span class="box_title"><a title="VB.NET Ms Excel Automation Source Code Sample " href="http://www.kdkeys.net/vb-net-ms-excel-automation-source-code-sample">
+                            VB.NET Ms Excel Automation Source Code Sample 
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            17</div>
+                        <span class="box_title"><a title="kmeans" href="http://www.kdkeys.net/kmeans">
+                            kmeans
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            </div>
+        <div class="tab-pane" id="help">
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="You Can Have Multiple Domains On Your Web Hosting Plan" href="http://www.kdkeys.net/you-can-have-multiple-domains-on-your-web-hosting-plan">
+                            You Can Have Multiple Domains On Your Web Hosting Plan
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="YALE - Yet Another Learning Environment" href="http://www.kdkeys.net/yale-yet-another-learning-environment">
+                            YALE - Yet Another Learning Environment
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="X-O Game (part 1)" href="http://www.kdkeys.net/x-o-game-part-1">
+                            X-O Game (part 1)
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="XML Web services .NET Remoting and System.NET Communication Guidelines" href="http://www.kdkeys.net/xml-web-services-net-remoting-and-system-net-communication-guidelines">
+                            XML Web services .NET Remoting and System.NET Communication Guidelines
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="XmdvTool - UNIX/LINUX/MAC/Windows - OpenGL and Tcl/Tk" href="http://www.kdkeys.net/xmdvtool-unixlinuxmacwindows-opengl-and-tcltk">
+                            XmdvTool - UNIX/LINUX/MAC/Windows - OpenGL and Tcl/Tk
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="XLMiner - Data Mining Add-In For Excel" href="http://www.kdkeys.net/xlminer-data-mining-add-in-for-excel">
+                            XLMiner - Data Mining Add-In For Excel
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Xelopes Library - Support Vector Machine, clustering methods, basket analysis" href="http://www.kdkeys.net/xelopes-library-support-vector-machine-clustering-methods-basket-analysis">
+                            Xelopes Library - Support Vector Machine, clustering methods, basket analysis
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="XCopy Deployment : Deploy .NET Framework Web Applications Using XCopy " href="http://www.kdkeys.net/xcopy-deployment-deploy-net-framework-web-applications-using-xcopy">
+                            XCopy Deployment : Deploy .NET Framework Web Applications Using XCopy 
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Wysistat - Web Traffic Analysis" href="http://www.kdkeys.net/wysistat-web-traffic-analysis">
+                            Wysistat - Web Traffic Analysis
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="WSDL - Web Services Description Language - XML Web Services" href="http://www.kdkeys.net/wsdl-web-services-description-language-xml-web-services">
+                            WSDL - Web Services Description Language - XML Web Services
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Writing Files using ASP.NET and the .NET Framework" href="http://www.kdkeys.net/writing-files-using-asp-net-and-the-net-framework">
+                            Writing Files using ASP.NET and the .NET Framework
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Working with the Form events" href="http://www.kdkeys.net/working-with-the-form-events">
+                            Working with the Form events
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Working with Records in Data Views in C#.NET" href="http://www.kdkeys.net/working-with-records-in-data-views-in-c-net">
+                            Working with Records in Data Views in C#.NET
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Working with MessageBox Class" href="http://www.kdkeys.net/working-with-messagebox-class">
+                            Working with MessageBox Class
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="WinMine Toolkit For Building Statistical Models From Data" href="http://www.kdkeys.net/winmine-toolkit-for-building-statistical-models-from-data">
+                            WinMine Toolkit For Building Statistical Models From Data
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Windows Forms Game: Terrarium .NET Framework, DirectX&amp;#174;, XML Web services" href="http://www.kdkeys.net/windows-forms-game-terrarium-net-framework-directx-xml-web-services">
+                            Windows Forms Game: Terrarium .NET Framework, DirectX&amp;#174;, XML Web services
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Windowing" href="http://www.kdkeys.net/windowing">
+                            Windowing
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Window Media Server Object" href="http://www.kdkeys.net/window-media-server-object">
+                            Window Media Server Object
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="WinCE (windows embedded environment) Based Program" href="http://www.kdkeys.net/wince-windows-embedded-environment-based-program">
+                            WinCE (windows embedded environment) Based Program
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Will Sql Server 2005 bring a Paradigm Shift to the Data Mining Industry?" href="http://www.kdkeys.net/will-sql-server-2005-bring-a-paradigm-shift-to-the-data-mining-industry">
+                            Will Sql Server 2005 bring a Paradigm Shift to the Data Mining Industry?
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Why use stored procedure groups?" href="http://www.kdkeys.net/why-use-stored-procedure-groups">
+                            Why use stored procedure groups?
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Why is it possible to create implement custom plug in algorithms only with C++ In Yukon (Sql Server 2005 Analysis Services)" href="http://www.kdkeys.net/why-is-it-possible-to-create-implement-custom-plug-in-algorithms-only-with-c-in-yukon-sql-server-2005-analysis-services">
+                            Why is it possible to create implement custom plug in algorithms only with C++ In Yukon (Sql Server 2005 Analysis Services)
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Why Businesses Need Web Sites" href="http://www.kdkeys.net/why-businesses-need-web-sites">
+                            Why Businesses Need Web Sites
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Who&#39;s help me please I&#39;s want c4.5 source code in vb.net " href="http://www.kdkeys.net/whos-help-me-please-is-want-c4-5-source-code-in-vb-net">
+                            Who&#39;s help me please I&#39;s want c4.5 source code in vb.net 
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            0</div>
+                        <span class="box_title"><a title="Who can tell me how to see the source code of Weka?" href="http://www.kdkeys.net/who-can-tell-me-how-to-see-the-source-code-of-weka">
+                            Who can tell me how to see the source code of Weka?
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            </div>
+        <div class="tab-pane" id="latest">
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            2</div>
+                        <span class="box_title"><a title="From where i can get source code of Naive bayesian classifier in C/C++" href="http://www.kdkeys.net/from-where-i-can-get-source-code-of-naive-bayesian-classifier-in-cc">
+                            From where i can get source code of Naive bayesian classifier in C/C++
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            4</div>
+                        <span class="box_title"><a title="anyone have data for association rules mining? " href="http://www.kdkeys.net/anyone-have-data-for-association-rules-mining">
+                            anyone have data for association rules mining? 
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            4</div>
+                        <span class="box_title"><a title="Algorithm for fuzzy match of login id / username" href="http://www.kdkeys.net/algorithm-for-fuzzy-match-of-login-id-username">
+                            Algorithm for fuzzy match of login id / username
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            5</div>
+                        <span class="box_title"><a title="Data mining conferences" href="http://www.kdkeys.net/data-mining-conferences">
+                            Data mining conferences
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            9</div>
+                        <span class="box_title"><a title="apriori&#39;s  algorithm code completly written in Matlab" href="http://www.kdkeys.net/aprioris-algorithm-code-completly-written-in-matlab">
+                            apriori&#39;s  algorithm code completly written in Matlab
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            2</div>
+                        <span class="box_title"><a title="using xml with sql server to use as a datasource " href="http://www.kdkeys.net/using-xml-with-sql-server-to-use-as-a-datasource">
+                            using xml with sql server to use as a datasource 
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            24</div>
+                        <span class="box_title"><a title="CART, C4.5/5.0, CHAID, Logistic regression  ...source code wanted ..." href="http://www.kdkeys.net/cart-c4-55-0-chaid-logistic-regression-source-code-wanted">
+                            CART, C4.5/5.0, CHAID, Logistic regression  ...source code wanted ...
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            97</div>
+                        <span class="box_title"><a title="need K-nearest neighbour source code in C/C++---URGENT" href="http://www.kdkeys.net/need-k-nearest-neighbour-source-code-in-cc-urgent">
+                            need K-nearest neighbour source code in C/C++---URGENT
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            4</div>
+                        <span class="box_title"><a title="apriori source code in Java" href="http://www.kdkeys.net/apriori-source-code-in-java">
+                            apriori source code in Java
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            22</div>
+                        <span class="box_title"><a title="source code for implementing a k-means algorithm in data clustering using vb" href="http://www.kdkeys.net/source-code-for-implementing-a-k-means-algorithm-in-data-clustering-using-vb">
+                            source code for implementing a k-means algorithm in data clustering using vb
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            2</div>
+                        <span class="box_title"><a title="Request Pincer-Search implementation" href="http://www.kdkeys.net/request-pincer-search-implementation">
+                            Request Pincer-Search implementation
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            7</div>
+                        <span class="box_title"><a title="C# simple Apriori code" href="http://www.kdkeys.net/c-simple-apriori-code">
+                            C# simple Apriori code
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            3</div>
+                        <span class="box_title"><a title="Clementine with Postgres" href="http://www.kdkeys.net/clementine-with-postgres">
+                            Clementine with Postgres
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            2</div>
+                        <span class="box_title"><a title="Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations" href="http://www.kdkeys.net/data-mining-practical-machine-learning-tools-and-techniques-with-java-implementations">
+                            Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            33</div>
+                        <span class="box_title"><a title="Appropriate minimal support and minconf for itemset?" href="http://www.kdkeys.net/appropriate-minimal-support-and-minconf-for-itemset">
+                            Appropriate minimal support and minconf for itemset?
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            36</div>
+                        <span class="box_title"><a title="Apriori &amp; FP growth algorithm in Java" href="http://www.kdkeys.net/apriori-p-growth-algorithm-in-java">
+                            Apriori &amp; FP growth algorithm in Java
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            23</div>
+                        <span class="box_title"><a title="Source code for privacy data mining on classification" href="http://www.kdkeys.net/source-code-for-privacy-data-mining-on-classification">
+                            Source code for privacy data mining on classification
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            3</div>
+                        <span class="box_title"><a title="fuzzy association rule" href="http://www.kdkeys.net/fuzzy-association-rule">
+                            fuzzy association rule
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            50</div>
+                        <span class="box_title"><a title="Open Source C#.NET Data Mining Project" href="http://www.kdkeys.net/open-source-c-net-data-mining-project">
+                            Open Source C#.NET Data Mining Project
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            42</div>
+                        <span class="box_title"><a title="K-MEANS CLUSTERING ALGORITHM DATA MINING TUTORIAL" href="http://www.kdkeys.net/k-means-clustering-algorithm-data-mining-tutorial">
+                            K-MEANS CLUSTERING ALGORITHM DATA MINING TUTORIAL
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            2</div>
+                        <span class="box_title"><a title="Code for Bi-Directional Extension (BIDE) Algorithm" href="http://www.kdkeys.net/code-for-bi-directional-extension-bide-algorithm">
+                            Code for Bi-Directional Extension (BIDE) Algorithm
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            8</div>
+                        <span class="box_title"><a title=" Can ETL tools transfer delimited files into a MySQL database?" href="http://www.kdkeys.net/can-etl-tools-transfer-delimited-files-into-a-mysql-database">
+                             Can ETL tools transfer delimited files into a MySQL database?
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            2</div>
+                        <span class="box_title"><a title="C#.NET Apriori Algorithm Source Code For Mining Shopping Carts" href="http://www.kdkeys.net/c-net-apriori-algorithm-source-code-for-mining-shopping-carts">
+                            C#.NET Apriori Algorithm Source Code For Mining Shopping Carts
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            2</div>
+                        <span class="box_title"><a title=" A class question" href="http://www.kdkeys.net/a-class-question">
+                             A class question
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row-fluid">
+                <div class="span12 post-sideBar">
+                    <div class="heading4">
+                        <div class="box_count count">
+                            2</div>
+                        <span class="box_title"><a title="Birch algorithm in C++" href="http://www.kdkeys.net/birch-algorithm-in-c">
+                            Birch algorithm in C++
+                        </a></span>
+                    </div>
+                </div>
+            </div>
+            </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#PostQATabs a:first').tab('show');
+    });
+</script>
+
+                    
+<div class="row-fluid center">
+    <h3 class="widget_title widget_members">
+        <i class="icon-search icon-user icon-black"></i>&nbsp;New Members ... Welcome!</h3>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    129</span> <a title="vignesh E in India"
+                        href="http://www.kdkeys.net/location/country/95">
+                        vignesh E&nbsp;(India) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    7</span> <a title="david yu in Canada"
+                        href="http://www.kdkeys.net/location/country/39">
+                        david yu&nbsp;(Canada) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    4</span> <a title="sha syam in Malaysia"
+                        href="http://www.kdkeys.net/location/country/127">
+                        sha syam&nbsp;(Malaysia) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    42</span> <a title="olumide Kayode in United States"
+                        href="http://www.kdkeys.net/location/country/225">
+                        olumide Kayode&nbsp;(United States) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    8</span> <a title="Hanh Dang in Vietnam"
+                        href="http://www.kdkeys.net/location/country/231">
+                        Hanh Dang&nbsp;(Vietnam) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    3</span> <a title="Michael Fitzsumons in Australia"
+                        href="http://www.kdkeys.net/location/country/13">
+                        Michael Fitzsumons&nbsp;(Australia) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    45</span> <a title="Heri Kodoy in Indonesia"
+                        href="http://www.kdkeys.net/location/country/96">
+                        Heri Kodoy&nbsp;(Indonesia) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    18</span> <a title="aylar faghih in Iran"
+                        href="http://www.kdkeys.net/location/country/97">
+                        aylar faghih&nbsp;(Iran) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    2</span> <a title="sa asd in Uganda"
+                        href="http://www.kdkeys.net/location/country/221">
+                        sa asd&nbsp;(Uganda) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    7</span> <a title="Mikhail Vaitukevich in United Kingdom"
+                        href="http://www.kdkeys.net/location/country/224">
+                        Mikhail Vaitukevich&nbsp;(United Kingdom) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    3</span> <a title="frank barb in Italy"
+                        href="http://www.kdkeys.net/location/country/102">
+                        frank barb&nbsp;(Italy) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    3</span> <a title="muthu karunarathna in Sri Lanka"
+                        href="http://www.kdkeys.net/location/country/199">
+                        muthu karunarathna&nbsp;(Sri Lanka) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    4</span> <a title="Ali Bal in Ukraine"
+                        href="http://www.kdkeys.net/location/country/222">
+                        Ali Bal&nbsp;(Ukraine) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    2</span> <a title="Celtc - in Argentina"
+                        href="http://www.kdkeys.net/location/country/10">
+                        Celtc -&nbsp;(Argentina) </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12 post-sideBar">
+            <div class="heading4">
+                <span class="box_count count_members">
+                    1</span> <a title="Ramiro Camacho in Bolivia"
+                        href="http://www.kdkeys.net/location/country/26">
+                        Ramiro Camacho&nbsp;(Bolivia) </a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+                    
+
+                    <!-- begin right sidebar 2 content ................................. -->
+                    
+<div class="row-fluid center">
+    <h3 class="widget_title widget_highlight">
+        <i class="icon-eye-open icon-black"></i>&nbsp;News</h3>
+    
+    <div class="post-sideBar">
+        <div class="common-post">
+            <div class="imageNews">
+                <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/content/images/thumbnails/16/80-thumbnail-16.png"
+                    alt="Real World OAuth using ASP.NET MVC" title="Real World OAuth using ASP.NET MVC" />
+            </div>
+            <div class="post-news">
+                <a title="Real World OAuth using ASP.NET MVC" href="http://www.kdkeys.net/real-world-oauth-using-aspnet-mvc">
+                    Real World OAuth using ASP.NET MVC
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="post-sideBar">
+        <div class="common-post">
+            <div class="imageNews">
+                <img class="img-responsive" style="float: left; border: 0px; margin: 5px;" src="http://images.kdkeys.net/content/images/webpages/1890/80-thumbnail-1890.jpg"
+                    alt="Glimpse Heads-Up Display released | Glimpse Blog" title="Glimpse Heads-Up Display released | Glimpse Blog" />
+            </div>
+            <div class="post-news">
+                <a title="Glimpse Heads-Up Display released | Glimpse Blog" href="http://www.kdkeys.net/glimpse-heads-up-display-released-glimpse-blog">
+                    Glimpse Heads-Up Display released | Glimpse Blog
+                </a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+                </div>
+            </div>
+            <!-- End Level-1 -->
+        </div>
+        <!-- End Content -->
+        <!-- Begin Footer -->
+        <div class="row-fluid">
+            <!-- Button to trigger modal -->
+            <!-- Modal -->
+            <div id="AskAQuestionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="AskAQuestionModalLabel"
+                aria-hidden="true">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×</button>
+                    <span id="AskAQuestionModalLabel"><strong>ASK A Question</strong> </span>
+                </div>
+                <div class="modal-body">
+                    
+<!-- begin form -->
+<form action="/Post/AskAQuestion" id="AskAQuestionForm" method="post">
+<input name="__RequestVerificationToken" type="hidden" value="gkMoprEs4ZpM4kd7nLvQmwsEwGg_2GMZ6PdW_91srr_8Y9ICCzDdal4mLu2CbA_QUtIpnr60IfYwZHXleKh2LSUBSNkZEkb_1ZYBhFXS8mch6wyqVFbxgQpB6n9nJRwJq8x2Lx-X35WHwlOP0P3axX2P9AJ9GLSbEQGe3tW9JQo1" />
+<fieldset>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="Title">Title or Subject</label>
+                </div>
+                <div class="editor-field">
+                    <input class="span12" data-val="true" data-val-required="The Title or Subject field is required." id="Title" name="Title" type="text" value="" />
+                    <span class="field-validation-valid" data-valmsg-for="Title" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="Message">Message</label>
+                </div>
+                <div class="editor-field">
+                    <textarea class="span12" cols="20" data-val="true" data-val-required="The Message field is required." id="Message" name="Message" rows="2">
+</textarea>
+                    <span class="field-validation-valid" data-valmsg-for="Message" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- BEGIN VISITOR -->
+    <div class="row-fluid">
+        <div class="span6">
+            <div class="control-group">
+                <label for="FirstName">Full Name (first and last name)</label>
+                <div class="controls">
+                    <input class="span12" data-val="true" data-val-required="The Full Name (first and last name) field is required." id="FirstName" name="FirstName" type="text" value="" />
+                    <span class="field-validation-valid" data-valmsg-for="FirstName" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+        <div class="span6">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="EmailAddress">Email Address</label>
+                </div>
+                <div class="controls">
+                    <div class="editor-field">
+                        <input class="span12" data-val="true" data-val-required="The Email Address field is required." id="EmailAddress" name="EmailAddress" type="text" value="" />
+                        <span class="field-validation-valid" data-valmsg-for="EmailAddress" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span6">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="City">Location: City, State, Country (separated by commas, e.g. Saint Louis, MO, USA)</label>
+                </div>
+                <div class="editor-field">
+                    <input class="span12" data-val="true" data-val-required="The Location: City, State, Country (separated by commas, e.g. Saint Louis, MO, USA) field is required." id="City" name="City" type="text" value="" />
+                    <span class="field-validation-valid" data-valmsg-for="City" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+        <div class="span6">
+            <div class="control-group">
+                <div class="editor-label">
+                    <label for="TaxonomyID">Choose a Category</label>
+                </div>
+                <div class="editor-field">
+                    <select class="span12" data-val="true" data-val-number="The field Choose a Category must be a number." data-val-required="The Choose a Category field is required." id="TaxonomyID" name="TaxonomyID"><option value="">Choose...</option>
+<option value="38">Data Analysis and Statistics</option>
+<option value="32">SQL Server Administration</option>
+<option value="31">Web Marketing</option>
+<option value="37">Clustering Tutorials and Articles</option>
+<option value="33">Sql Server General</option>
+<option value="34">Web Services</option>
+<option value="39">Data Mining Books!</option>
+<option value="36">.NET and Microsoft&#174; Office</option>
+<option value="35">Software Products, Services and Solutions</option>
+<option value="40">Text Mining</option>
+<option value="41">Open Source Data Mining Projects</option>
+<option value="301">Matlab</option>
+<option value="42">.NET Applicatons Directory</option>
+<option value="45">Data Mining Resources</option>
+<option value="296">Naive Bayes Algorithm</option>
+<option value="46">Game Development and Game Programming</option>
+<option value="294">Fuzzy Algorithm</option>
+<option value="44">Jobs</option>
+<option value="43">Data Mining News</option>
+<option value="51">SQL Server Management Tools</option>
+<option value="52">ASP (Active Server Pages) Web Development</option>
+<option value="54">Blogs</option>
+<option value="53">Hall Of Fame</option>
+<option value="50">Data Mining With SQL Server</option>
+<option value="56">Mobile Applications and .NET Compact Framework</option>
+<option value="55">Security and SQL Server</option>
+<option value="59">DTS, Data Import and Export</option>
+<option value="64">XML and SQL Server</option>
+<option value="62">.NET Remoting, Asynchronous Patterns, Delegates, Threading, Reflection</option>
+<option value="63">.NET Framework News</option>
+<option value="58">.NET Architecture, Design and Enterprise Services</option>
+<option value="61">Files, Directories, Input or Output Operations</option>
+<option value="65">Vendors</option>
+<option value="69">Microsoft Neural Network Algorithm</option>
+<option value="70">Microsoft Decision Trees Algorithm</option>
+<option value="298">Support Vector Machine</option>
+<option value="75">Articles and Tutorials</option>
+<option value="78">2005 Newsletter Archive</option>
+<option value="76">Microsoft Association Algorithm</option>
+<option value="66">Lounge</option>
+<option value="79">SQL Server 2005</option>
+<option value="74">SQL Server 2005 (Yukon) Analysis Services Data Mining</option>
+<option value="71">SQL Server News</option>
+<option value="73">Website Support</option>
+<option value="87">FAQs</option>
+<option value="80">SQL Server Chat Room</option>
+<option value="96">Lift Chart, Profit Chart, Confusion Matrix</option>
+<option value="77">Microsoft Clustering Algorithm</option>
+<option value="95">Online Analytical Processing (OLAP)</option>
+<option value="94">OLAP</option>
+</select>
+                    <span class="field-validation-valid" data-valmsg-for="TaxonomyID" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END VISITOR -->
+    
+</fieldset>
+</form>
+<!-- add scripts at the footer for delayed loading -->
+<script src="/Content/scripts/mvc.jquery.extends.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    $(function () {
+        $('#SubmitYourQuestionButton').on('click', function () {
+            if ($('#AskAQuestionForm').valid()) {
+
+                $('#AskAQuestionModal').block({ baseZ: 1000, allowBodyStretch: true, timeout: 20000, cursor: 'wait', css: { width: '100%', backgroundColor: '#EEE' }, message: '<div class="loadwait"><img src="http://www.kdkeys.net/content/images/loading.gif" /> Please Wait ...</div>' });
+                var data = $('#AskAQuestionForm').serialize();
+                var dataUrl = 'http://www.kdkeys.net/' + 'Post/AskAQuestion';
+
+                var heading = 'Ask A Queston';
+                var question_error = 'An error occured and your message was not submitted. Please contact the administrator or try again later!';
+                var cancelButtonTxt = 'Cancel';
+                var okButtonTxt = 'OK';
+                var callbackOK = function () {
+                    //do nothing
+                    $("#AskAQuestionModal").modal("hide");
+                };
+                var callbackCancel = function () {
+                    //do nothing
+                    $("#AskAQuestionModal").modal("hide");
+                };
+
+                $.post(dataUrl, data, function (result) {
+                    if (result.Success) {
+                        clearForm($('#AskAQuestionForm'), [])
+
+                        ShowOKCancelModal(heading, result.Success_Message, cancelButtonTxt, okButtonTxt, callbackOK, callbackCancel);
+                    }
+                    else {
+                        ShowOKCancelModal(heading, question_error, cancelButtonTxt, okButtonTxt, callbackOK, callbackCancel);
+                    }
+
+                });
+                $.unblockUI({ fadeOut: 2000 });
+
+            }
+        });
+    });
+
+</script>
+<!-- end scripts at the footer for delayed loading -->
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">
+                        Close</button>
+                    <input type="submit" value="Submit Your Question" class="btn btn-info btn-large"
+                        id="SubmitYourQuestionButton" name="SubmitYourQuestionButton" />
+                </div>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <div class="span2 offset1">
+            </div>
+            <div id="footer" class="navbar navbar-fixed-bottom">
+                <i class="icon-certificate icon-white"></i>&nbsp;COPYRIGHT &COPY; 2007 - 2012&nbsp;Ask A Data Miner -  75,000+ Members&nbsp;
+                <a href="http://www.twitter.com/kingsleytagbo">
+                    <img src="/Content/images/twitter_16p.png" alt="Follow us on Twitter"
+                        title="Follow us on Twitter" />Follow On Twitter</a>&nbsp;&nbsp;<a href="http://www.feedblitz.com/f/?Sub=165629">
+                            <img src="/Content/images/latest-news-16p.png" alt="Subscribe to our Newsletter"
+                                title="Subscribe to our Newsletter" />Request More Information</a>&nbsp;&nbsp;<i
+                                    class="icon-lock icon-white"></i>&nbsp;
+
+<span id="Account_UserName" style="display: none"></span>&nbsp;<span id="Account_LogOff" style="display: none">[<a href="/Account/Logoff">Log Off</a>]</span>
+<span id="Account_LogOn">[<a href="/Account/Logon/java-source-code-for-decision-tree-algorithm">Log On</a>]</span>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var dataUrl = 'http://www.kdkeys.net/' + 'Account/GetMemberLoginView';
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            traditional: true,
+            url: dataUrl,
+            headers: { "cache-control": "no-cache" },
+            data: $('<form><input name="__RequestVerificationToken" type="hidden" value="lRo0pa-4hRhekQa5Vi3eU1pzrz24gTAT7DAh1DgMWqArb_CfGBdSntZ-UYrY35V-aD7Nx4_ooQU_uHaJ_Jp41mPbP20PR41VSXZU-eJVHoJ73wqdJZdGHQm_Py6whIg-P6_j5GWA1xVHNfadmsyQwLQSAlrKCijupTM5JkGrSqE1" /></form>').serialize(),
+            success: function (result) {
+                if (result.Success) {
+                    $("#Account_UserName").text(result.Success_Data.UserName);
+                    showLogon(false);
+                }
+                else {
+                    showLogon(true);
+                }
+            }            ,
+            error: function () {
+                showLogon(true);
+            }
+        });
+    });
+
+    function showLogon(display) {
+        if (display) {
+            $("#Account_UserName").hide();
+            $("#Account_LogOff").hide();
+            $("#Account_LogOn").show();
+        }
+        else {
+            $("#Account_UserName").show();
+            $("#Account_LogOff").show();
+            $("#Account_LogOn").hide();
+        }
+    }
+</script>
+
+                
+            </div>
+        </div>
+        <!-- End Footer -->
+        <!-- begin handle search form -->
+        <script type="text/javascript">
+            $("#searchform").submit(function () {
+                var isFormValid = false;
+
+                $(".required input").each(function () {
+                    if ($(this).val() === undefined) {
+                        isFormValid = false;
+                    }
+                    else if ($(this).val().length == 0) {
+                        isFormValid = false;
+                    }
+                    else if ($(this).val().length > 3 && $(this).val() != 'Search...') {
+                    }
+
+                    if (!isFormValid) {
+                        $(this).switchClass("", "highlight", 2000, "easeInOutQuad");
+                    }
+                    else {
+                        $(this).switchClass("highlight", "", 2000, "easeInOutQuad");
+                    }
+                });
+
+                return isFormValid;
+            });
+        </script>
+        <!-- end  handle search form -->
+    </div>
+    <!-- BEGIN HIDDEN SECTION -->
+    
+    <!-- BEGIN SUBMIT A REFERENCE -->
+    <div id="AddAReferenceSection" class="modal hide fade in" style="display: none;">
+        <div class="modal-header">
+            <button class="close" data-dismiss="modal" onclick="$('#AddAReferenceSection').hide();">
+                x</button>
+            <strong>Add A Reference / Link</strong>
+        </div>
+        <div class="modal-body">
+            <div id="highlight-AddAReference" class="alert hide">
+                <p id="AddAReferenceSaveResults">
+                    <span class="ui-icon ui-icon-success" style="float: left; margin-right: .3em;"></span>
+                    <span id="AddAReferenceSaveSpanResults"></span>
+                </p>
+            </div>
+            <form id="AddAReferenceForm" name="AddAReferenceForm" action="AddAReference">
+            
+            <input name="__RequestVerificationToken" type="hidden" value="NuyvDVwE549YMyUu8g3KptzniCKidvspdyu0JxMyBzJ32fMC_31VB8g3YnWntebxAU5U97wjwTRyCXCLtUJLrDui5CF58tt1RyGzb7_U9oEn5_Z8-4di5lcTQlomDC7xWFIZwLzPfr9hzeH3ukX8F44WmxlTd2vzub8MwEPX8l01" />
+            <fieldset>
+                
+<fieldset>
+    <div class="row-fluid">
+        <div class="span6">
+            <div class="editor-label">
+                <label for="Name">Author&#39;s Full Name (first and last name)</label>
+            </div>
+            <div class="editor-field">
+                <input class="span12" data-val="true" data-val-required="The Author&#39;s Full Name (first and last name) field is required." id="Name" name="Name" type="text" value="" />
+                <span class="field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+        <div class="span6">
+            <div class="editor-label">
+                <label for="Email">Author&#39;s Email Address</label>
+            </div>
+            <div class="editor-field">
+                <input class="span12" id="Email" name="Email" type="text" value="" />
+                <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="editor-label">
+                <label for="Link">Article Url / Link</label>
+            </div>
+            <div class="editor-field">
+                <input class="span12" data-val="true" data-val-required="The Article Url / Link field is required." id="Link" name="Link" type="text" value="" />
+                <span class="field-validation-valid" data-valmsg-for="Link" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="editor-label">
+                <label for="PostTags">Article - Tags</label>
+            </div>
+            <div class="editor-field">
+                <input class="span12" data-val="true" data-val-required="The Article - Tags field is required." id="PostTags" name="PostTags" type="text" value="" />
+                <span class="field-validation-valid" data-valmsg-for="PostTags" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="editor-label">
+                <label for="PostSummary">Article - Summary</label>
+            </div>
+            <div class="editor-field">
+                <textarea class="span12" cols="20" data-val="true" data-val-required="The Article - Summary field is required." id="PostSummary" name="PostSummary" rows="2">
+</textarea>
+                <span class="field-validation-valid" data-valmsg-for="PostSummary" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+                <input id="TopicTitle" name="TopicTitle" type="hidden" value="java source code for decision tree algorithm" />
+                <input id="HostName" name="HostName" type="hidden" value="http://www.kdkeys.net" />
+                <input id="PostDate" name="PostDate" type="hidden" value="2/11/2015 1:57:53 AM" />
+                <input id="LinkID" name="LinkID" type="hidden" value="1381" />
+                <input id="PostId" name="PostId" type="hidden" value="1381" />
+                <input id="PermaLinkId" name="PermaLinkId" type="hidden" value="http://www.kdkeys.net/java-source-code-for-decision-tree-algorithm" />
+            </fieldset>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" onclick="$('#AddAReferenceSection').hide();">Close</a><input
+                type="submit" name="AddAReferenceButton" id="AddAReferenceButton" class="btn btn-info btn-large"
+                value="Submit A Link" />
+        </div>
+    </div>
+    <!-- END SUBMIT A REFERENCE -->
+    <!--BEGIN EMAIL NEWSLETTER SIGNUP FORM -->
+    <div id="EmailNewsletterSection">
+    </div>
+    <!--END EMAIL NEWSLETTER SIGNUP FORM -->
+
+    <!-- END HIDDEN SECTION -->
+    <!-- End Container -->
+    <!-- begin script for newsletter home page -->
+    <!-- end script for newsletter home page -->
+</body>
+</html>

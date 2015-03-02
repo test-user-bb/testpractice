@@ -3,15 +3,17 @@ class StairClimbing
 	//now we create a test case
 	public static void main(String[] args)
 	{
-		//now let's see the performance difference using larger case and count time used
-		long startTime = System.currentTimeMillis();
-		System.out.println("Ways of 35-steps: (recursive) "+ways(35));
-		System.out.println("Time used (recursive)"+(System.currentTimeMillis()-startTime));
-
-		startTime = System.currentTimeMillis();//update time for start of iterative method
-		System.out.println("Ways of 35-steps: (interation) "+waysInteration(35));
+		long startTime = System.currentTimeMillis();//update time for start of iterative method
+		System.out.println("Ways of 35-steps: (interation) "+waysInteration(350));
 		System.out.println("Time used (iterative)"+(System.currentTimeMillis()-startTime));
 
+		
+		//now let's see the performance difference using larger case and count time used
+		startTime = System.currentTimeMillis();
+		System.out.println("Ways of 35-steps: (recursive) "+ways(350));
+		System.out.println("Time used (recursive)"+(System.currentTimeMillis()-startTime));
+
+		
 		//same result, but the optimized method has much better performance
 		//this is one of the simplest example to show the power of dynamic programming (DP)
 	}

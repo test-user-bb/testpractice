@@ -1,4 +1,4 @@
-package num.CrackingInterviews;
+
 
 public class Sqrt {
 	//define method header
@@ -31,6 +31,14 @@ public static double sqrt(double a)
 	//if we did not find exact sqrt value, we return the approxiated value with the defined precision
 	return (start+end)/2;
 }
+
+public static void main(String[] args){
+	System.out.println(sqrt(1));
+	//System.out.println(getSquareRoot(4));
+	System.out.println(sqrt(9));
+	System.out.println(sqrt(36));
+}
+
 }
 
 

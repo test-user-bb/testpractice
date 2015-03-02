@@ -3,7 +3,8 @@ class ArrayInplaceRotate
 	//all right last step to test our code
 	public static void main(String[] args)
 	{
-		int[] nums = {1,2,3,4,5,6};
+		//int[] nums = {1,2,3,4,5,6};
+		int[] nums = {1,2,3,4,5,6,7,8};
 		int k = 3;//so after rotation, we expect {4,5,6,1,2,3}
 		System.out.println("Original: "+java.util.Arrays.toString(nums));
 		rotate(nums, k);

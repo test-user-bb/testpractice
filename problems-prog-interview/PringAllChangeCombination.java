@@ -3,7 +3,7 @@ class PringAllChangeCombination
 	//now we create a test case
 	public static void main(String[] args)
 	{
-		int[] coins = {25,10,5,1};//set as usual coins we use
+		int[] coins = {25,10,5};//set as usual coins we use
 		int[] counts = new int[coins.length];//set the default counts array
 		System.out.print("All possible coin combinations of 25 cents are: ");
 		PringCombination(coins, counts, 0, 25);//let's test the case of 25 cents, and notice default initial startIndex = 0
@@ -18,6 +18,10 @@ class PringAllChangeCombination
 	//total amount keep track of remaining amount left processing
 	public static void PringCombination(int[] coins, int[] counts, int startIndex, int totalAmount)
 	{
+		System.out.println("\n Entry Remaining amount:" +totalAmount);
+		System.out.println("Entry Start index:"+startIndex);
+		
+		
 		//firstly decide if we should proceed or not by track startIndex
 		if(startIndex>=coins.length)//we have processed all coins
 		{
@@ -48,6 +52,10 @@ class PringAllChangeCombination
 			{
 				//for every cycle in a loop, we choose an arbitrary number of larger coins and proceed next
 				counts[startIndex] = i;
+				int x= totalAmount-coins[startIndex]*i;
+				System.out.println("\n Loop Remaining amount:" +x);
+				int y = startIndex+1;
+				System.out.println("Loop Start index:"+ y);
 				PringCombination(coins, counts, startIndex+1, totalAmount-coins[startIndex]*i);
 				//notice we need update the remaining amount
 			}

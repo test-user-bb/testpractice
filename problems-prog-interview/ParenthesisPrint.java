@@ -5,7 +5,8 @@ class  ParenthesisPrint
 	{
 		//PrintParenthesis(3,3,"");//test print all valid combinations of 3 groups of parenthesis
 
-		PrintParenthesis(3,3,"");//try 5 groups
+		//PrintParenthesis(3,3,"");//try 5 groups
+		PrintParenthesis(1,1,"");//try 5 groups
 	}
 
 
@@ -31,7 +32,11 @@ class  ParenthesisPrint
 		}
 		else//now there are only right parenthesis left
 			PrintParenthesis(leftRemain, rightRemain-1, currentString+")");
+
+		
 	}
+	
+
 }
 
 

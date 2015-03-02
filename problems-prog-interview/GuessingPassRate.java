@@ -5,6 +5,7 @@ class GuessingPassRate
 	{
 		System.out.println("Ratio of guessing 5 out of 10 is " +passingRatio(10, 5));
 		System.out.println("Ratio of guessing 2 out of 4 is " +passingRatio(4, 2));
+		System.out.println("Ratio of guessing 1 out of 2 is " +passingRatio(2, 1));
 	}
 
 	//define the key method
