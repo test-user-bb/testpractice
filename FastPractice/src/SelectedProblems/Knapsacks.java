@@ -9,7 +9,6 @@ public class Knapsacks {
 
 	static int[][] data;
 
-
 	public static void main(String[] args){
 
 		System.out.println(fillKnapSack(5,5));
@@ -61,22 +60,14 @@ public class Knapsacks {
 		// also for all items =0, 
 
 
-		for (int item=0; item<=items;++item){
-			for(int capasityAtState=0;capasityAtState<=capasityMax;++capasityAtState){
+		for (int item=0; item<=weigts.length;++item){
+			for(int capasityAtState=0;capasityAtState<=weigts.length;++capasityAtState){
 				//Base init condition.
 				if( item==0 || capasityAtState ==0 ){
 					data[item][capasityAtState]=0;
-
 				}else{
 
 					if(capasityAtState >= weigts[item-1]){
-//						System.out.println(item);
-//						try {
-//							//Thread.sleep(10);
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
 						int include = values[item-1]  + data[item-1][capasityAtState-weigts[item-1]];
 						int exclude =  data[item-1][capasityAtState];
 						int num = include >= exclude ?  include : exclude;
