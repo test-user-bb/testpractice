@@ -1,0 +1,8 @@
+{
+      "AuctionCreateThreadsCount": "10",
+      "ExpiryProcessAuctionThreadCount":"10",
+      "MaxTopBids":"5",
+      "ConcurrentBidRecvQ":"10",
+      "bidAddThreadCount":"10"
+      
+}
