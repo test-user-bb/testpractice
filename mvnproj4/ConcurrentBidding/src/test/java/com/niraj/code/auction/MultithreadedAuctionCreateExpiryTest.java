@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import com.niraj.code.AuctionFactory;
 import com.niraj.code.item.Item;
 import com.niraj.code.user.User;
 
@@ -14,7 +15,7 @@ public class MultithreadedAuctionCreateExpiryTest {
 	@Test
 	public void auctionCreateTest() {
 
-		AuctionManager aum = AuctionManagerImpl.getInstance();
+		AuctionManager aum = AuctionFactory.getAuctionmanager();
 		
 		User user1 = new User("user1","bawankar1","niraj1");
 		User user2 = new User("user2","bawankar2","niraj2");

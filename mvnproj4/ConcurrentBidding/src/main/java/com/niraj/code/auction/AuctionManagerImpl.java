@@ -8,6 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+
+import com.niraj.code.AuctionFactory;
 import com.niraj.code.config.AuctionConfig;
 import com.niraj.code.item.Item;
 import com.niraj.code.user.User;
@@ -35,7 +37,7 @@ public class AuctionManagerImpl implements AuctionManager {
 	 * These singleton will be used by drivers and threads to access the object.
 	 * 
 	 */
-	static AuctionManager getInstance(){
+	public static AuctionManager getInstance(){
 		return auctionManager;
 	}
 
@@ -55,14 +57,14 @@ public class AuctionManagerImpl implements AuctionManager {
 	 *  This provides the decoupling scalability  
 	 */
 	public void createAuction(Auction auction) {
-			AuctionProcessorImpl.getInstance().createAuction(auction);
+			AuctionFactory.getAuctionProcessor().createAuction(auction);
 	}
 
 	public String getAllAuctions() {
-		return AuctionProcessorImpl.getInstance().getAllAuctions();
+		return AuctionFactory.getAuctionProcessor().getAllAuctions();
 	}
 	public int getAllAuctionsCount() {
-		return AuctionProcessorImpl.getInstance().getAllAuctionsCount();
+		return AuctionFactory.getAuctionProcessor().getAllAuctionsCount();
 	}
 
 
