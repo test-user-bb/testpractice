@@ -1,0 +1,5 @@
+{
+      "AuctionCreateThreadsCount": "10",
+      "ExpiryProcessAuctionThreadCount":"10",
+      "MaxTopBids":"5"
+}
