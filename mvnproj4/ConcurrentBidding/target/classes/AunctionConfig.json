@@ -1,0 +1,4 @@
+{
+      "AuctionCreateThreadsCount": "10",
+      "ExpiryProcessAuctionThreadCount":"10"
+}
